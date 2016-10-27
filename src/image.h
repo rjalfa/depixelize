@@ -1,0 +1,54 @@
+#ifndef IMAGE_H
+#define IMAGE_H
+
+#include <cstdio>
+#include <tuple>
+#include <utility>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+class Image;
+
+// Source: http://stackoverflow.com/questions/20595340/loading-a-tga-bmp-file-in-c-opengl
+class BMP
+{
+private:
+    std::uint32_t width, height;
+    std::uint16_t BitsPerPixel;
+    std::vector<std::uint8_t> Pixels;
+
+public:
+    BMP(const char* FilePath);
+    std::vector<std::uint8_t> GetPixels() const {return this->Pixels;}
+    std::uint32_t GetWidth() const {return this->width;}
+    std::uint32_t GetHeight() const {return this->height;}
+    bool HasAlphaChannel() {return BitsPerPixel == 32;}
+};
+
+class _pixel
+{
+	Image* image_ref;
+	tuple<unsigned int,unsigned int,unsigned int> colors;
+	pair<unsigned int,unsigned int> position;
+	public:
+		_pixel(Image* const image_ref, int R, int G, int B, int x, int y);
+        unsigned int getX() {return this->position.first;}
+        unsigned int getY() {return this->position.first;}
+};	
+
+class Image
+{
+	unsigned int width;
+	unsigned int height;
+	vector<_pixel> pixels;
+	
+	public:
+		Image(string file);
+        _pixel* operator()(unsigned int i, unsigned int j);
+        unsigned int getWidth() const {return this->width;}
+        unsigned int getHeight() const {return this->height;}
+        vector<_pixel> getPixels() {return this->pixels;}
+};
+
+#endif
