@@ -24,6 +24,12 @@ class Node
 		{
 			this->adjacent[i] = n;
 		}
+		int valence()
+		{
+			int cnt = 0;
+			for(int i = 0 ; i < 8 ; i ++) if(this->adjacent != nullptr) cnt++;
+			return cnt;
+		}
 		
 };
 
@@ -32,6 +38,7 @@ class Graph
 	vector<Node> nodes;
 	public:
 		Graph(Image& image);
+		void planarize();
 };
 
 #endif

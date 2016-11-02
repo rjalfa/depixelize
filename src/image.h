@@ -35,6 +35,7 @@ class _pixel
 		_pixel(Image* const image_ref, int R, int G, int B, int x, int y);
         unsigned int getX() {return this->position.first;}
         unsigned int getY() {return this->position.first;}
+        bool isSimilar(_pixel& a);
 };	
 
 class Image

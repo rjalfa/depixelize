@@ -55,3 +55,8 @@ _pixel* Image::operator()(unsigned int i, unsigned int j)
     if(i >= 0 && i < width && j >= 0 && j < width) return &pixels[i*width + j];
     else return nullptr;
 }
+
+bool _pixel::isSimilar(_pixel& a)
+{
+    return (abs((unsigned int)(get<0>(this->colors)-get<0>(a.colors)) <= 0.1))&&(abs((unsigned int)(get<1>(this->colors)-get<1>(a.colors)) <= 0.1))&&(abs((unsigned int)(get<2>(this->colors)-get<2>(a.colors)) <= 0.1));
+}
