@@ -5,39 +5,23 @@
 
 #include "image.h"
 
-class Node
-{
-	_pixel* info;
-	Node* adjacent[8];
-	public:
-		Node(_pixel* p)
-		{
-			this->info = p;
-			for(int i = 0; i < 8; i++) adjacent[i] = nullptr;
-		}
-		_pixel* getPixel() {return this->info;}
-		Node* getAdjacent(int i)
-		{
-			return this->adjacent[i];
-		}
-		void setAdjacent(int i, Node* n)
-		{
-			this->adjacent[i] = n;
-		}
-		int valence()
-		{
-			int cnt = 0;
-			for(int i = 0 ; i < 8 ; i ++) if(this->adjacent != nullptr) cnt++;
-			return cnt;
-		}
-		
-};
+//DIRECTION MACROS
+#define TOP 1
+#define TOP_RIGHT 2
+#define TOP_LEFT 0
+#define LEFT 3
+#define RIGHT 4
+#define BOTTOM 6
+#define BOTTOM_RIGHT 7
+#define BOTTOM_LEFT 5
 
 class Graph
 {
 	Image* image;
 	vector<vector<vector<bool>>> edges;
 	vector<vector<vector<int>>> weights;
+	
+	void removeCross();
 	public:
 		Graph(Image& image);
 		void planarize();

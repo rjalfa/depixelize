@@ -46,7 +46,31 @@ Graph::Graph(Image& imageI)
 	}
 }
 
+void Graph::removeCross()
+{
+	//Take current pixel as top-left of a 4 pixel square and check whether the colors are same in all
+	for(int i = 0 ; i < this->image->getWidth() - 1; i++) for(int j = 0 ; j < this->image->getHeight() - 1; j++)
+	{
+		_pixel* topLeft = (*this->image)(i,j);
+		_pixel* topRight = (*this->image)(i+direction[RIGHT][0],j+direction[RIGHT][1]);
+		_pixel* bottomLeft = (*this->image)(i+direction[BOTTOM][0],j+direction[BOTTOM][1]);
+		_pixel* bottomRight = (*this->image)(i+direction[BOTTOM_RIGHT][0],j+direction[BOTTOM_RIGHT][1]);
+		if(topLeft->isSimilar(*topRight) && topLeft->isSimilar(*bottomLeft) && topLeft->isSimilar(*bottomRight) && bottomLeft->isSimilar(*topRight))
+		{
+			//All colors are same in the square, remove diagonal edges
+			this->edges[topLeft->getX()][topLeft->getY()][BOTTOM_RIGHT] = false;
+			this->edges[bottomRight->getX()][bottomRight->getY()][TOP_LEFT] = false;
+			this->edges[topRight->getX()][topRight->getY()][BOTTOM_LEFT] = false;
+			this->edges[bottomLeft->getX()][bottomLeft->getY()][TOP_RIGHT] = false;
+		}
+	}
+	 
+}
+
 void Graph::planarize()
 {
-	//
+	//Remove Crosses for obvious planarization
+	this->removeCross();
+
+	
 }
