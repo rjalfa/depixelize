@@ -17,26 +17,32 @@ bool isValid(int x,int y, int w, int h)
 	return (x>=0 && x<w && y>=0 && y<h);
 }
 
-Graph::Graph(Image& image)
+Graph::Graph(Image& imageI)
 {
-	auto data = image.getPixels();
-	for(_pixel p : data) nodes.push_back(Node(&p));
-	//Create a all-direction graph
-	for(int i = 0; i <nodes.size(); i++ )
+	this->image = &imageI;
+	int h = image->getHeight();
+	int w = image->getWidth();
+
+	//Semantic
+	// edges[i][j][k] -> denotes whether there is a an edge from (i,j) in kth direction in the graph
+
+	for(int i = 0; i < w; i++) 
 	{
-		_pixel p = *nodes[i].getPixel();
-		for(int j = 0 ; j < 8 ; j++) if(isValid(p.getX()+direction[i][0],p.getY()+direction[i][1], image.getWidth(),image.getHeight()))
-				nodes[i].setAdjacent( j, &nodes[ (p.getX()+direction[i][0]) * (image.getWidth()) + p.getY()+direction[i][1] ] );
+		vector<vector<bool>> v1;
+		vector<vector<int>> v2;
+		for(int j = 0; j < h; j ++)
+		{
+			v1.push_back(vector<bool>(8,false));
+			v2.push_back(vector<int>(8,0));
+		}
+		edges.push_back(v1);
+		weights.push_back(v2);
 	}
 
-	//remove dissimilar adjacents
-	for(Node n : nodes)
-	{
-		for(int j = 0 ; j < 8 ; j++)
-		{
-			if(n.getAdjacent(j) == nullptr) continue;
-			if(!(n.getPixel()->isSimilar(*n.getAdjacent(j)->getPixel()))) n.setAdjacent(j,nullptr);
-		}
+	//Add edge if similar color
+	for(int i = 1 ; i < w ; i++) for(int j = 0; j < h; j++) for(int k = 0 ; k < 8; k ++) {
+		if((*image)(i+direction[k][0],j+direction[k][1]) != nullptr)
+			edges[i][j][k] = (*image)(i,j)->isSimilar(*(*image)(i+direction[k][0],j+direction[k][1]));
 	}
 }
 

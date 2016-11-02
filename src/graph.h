@@ -35,10 +35,18 @@ class Node
 
 class Graph
 {
-	vector<Node> nodes;
+	Image* image;
+	vector<vector<vector<bool>>> edges;
+	vector<vector<vector<int>>> weights;
 	public:
 		Graph(Image& image);
 		void planarize();
+		Graph()
+		{
+			image = nullptr;
+			edges.clear();
+			weights.clear();
+		}
 };
 
 #endif
