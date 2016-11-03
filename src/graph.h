@@ -4,7 +4,8 @@
 #define _GRAPH_H
 
 #include "image.h"
-
+#include <stack>
+using namespace std;
 //DIRECTION MACROS
 #define TOP 1
 #define TOP_RIGHT 2
@@ -23,7 +24,7 @@ class Graph
 	
 	void removeCross();
 	void curves_heuristic(int,int,int);
-	void sparse_pixels_heuristic(int,int,int);
+	void sparse_pixels_heuristic(int,int);
 	void islands_heuristic(int x, int y);
 	int valence(int x,int y);
 	public:

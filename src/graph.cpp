@@ -78,7 +78,7 @@ int Graph::valence(int x,int y)
 
 void Graph::curves_heuristic(int x, int y, int DIRECTION)
 {
-
+	
 }
 
 void Graph::islands_heuristic(int x,int y)
@@ -86,9 +86,67 @@ void Graph::islands_heuristic(int x,int y)
 	for(int i = 0; i < 8; i++) if(edges[x][y][i] == true) weights[x][y][i] = 5 * ((valence(x,y) == 1) + (valence(x+direction[BOTTOM_RIGHT][0],y+direction[BOTTOM_RIGHT][1]) == 1));
 }
 
-void Graph::sparse_pixels_heuristic(int x, int y, int DIRECTION)
+bool insideBounds(int x, int y, int row_st, int row_end, int col_st, int col_end)
 {
+	return (x>=row_st && x <= row_end && y >= col_st && y <= col_end);
+}
+
+void Graph::sparse_pixels_heuristic(int x, int y)
+{
+	//Directions are BOTTOM_RIGHT, and BOTTOM_LEFT
+	//Measure the size of the connected component in a 8x8 box
+	if(!insideBounds(x+direction[RIGHT][0],y+direction[RIGHT][1],0,image->getWidth()-1,0, image->getHeight()-1)) return;
+	int labels[8][8] = {0}; 
+	stack<pair<int,int>> st;
+	//Do DFS from (x,y) labeling 1 to each connected node.
+	st.push(make_pair(x,y));
+	labels[3][3] = 1; // Position of (X,Y) in the label array
+	while(!st.empty())
+	{
+		pair<int,int> point = st.top();
+		int p = point.first;
+		int q = point.second;
+		st.pop();
+		for(int i = 0 ; i < 8; i++)
+		{
+			//See in all directions, scan for points that are in the not yet visited, in the 8x8 box, and have an edge from the current point.
+			if(!insideBounds(p+direction[i][0],q+direction[i][1],0,image->getWidth()-1,0, image->getHeight()-1) || !insideBounds(p+direction[i][0],q+direction[i][1],x-3,x+4,y-3,y+4)) continue;
+			if(labels[3+p+direction[i][0]-x][3+q+direction[i][1]-y] != 0) continue;
+			if(edges[p][q][i] == false) continue;
+			st.push(make_pair(p+direction[i][0],q+direction[i][1]));
+			labels[3+p+direction[i][0]-x][3+q+direction[i][1]-y] = 1;
+		}
+	}
+
+	st.push(make_pair(x+direction[RIGHT][0],y+direction[RIGHT][1]));
+	labels[4][3] = 2;
 	
+	while(!st.empty())
+	{
+		pair<int,int> point = st.top();
+		int p = point.first;
+		int q = point.second;
+		st.pop();
+		for(int i = 0 ; i < 8; i++)
+		{
+			//See in all directions, scan for points that are in the not yet visited, in the 8x8 box, and have an edge from the current point.
+			if(!insideBounds(p+direction[i][0],q+direction[i][1],0,image->getWidth()-1,0, image->getHeight()-1) || !insideBounds(p+direction[i][0],q+direction[i][1],x-3,x+4,y-3,y+4)) continue;
+			if(labels[3+p+direction[i][0]-x][3+q+direction[i][1]-y] != 0) continue;
+			if(edges[p][q][i] == false) continue;
+			st.push(make_pair(p+direction[i][0],q+direction[i][1]));
+			labels[3+p+direction[i][0]-x][3+q+direction[i][1]-y] = 1;
+		}
+	}
+
+	//Find the size of the connected components
+	int componentA = 0, componentB = 0;
+	for(int i = 0 ; i < 8 ; i++) for(int j = 0 ; j < 8; j++)
+	{
+		if(labels[i][j] == 1) componentA++;
+		else if(labels[i][j] == 2) componentB++;
+	}
+	if(componentA > componentB) weights[x+direction[RIGHT][0]][y+direction[RIGHT][1]][BOTTOM_LEFT] += componentA - componentB;
+	else weights[x][y][BOTTOM_RIGHT] += componentB - componentA;
 }
 
 void Graph::planarize()
@@ -117,8 +175,7 @@ void Graph::planarize()
 			this->islands_heuristic(topRight->getX(),topRight->getY());
 			this->curves_heuristic(topLeft->getX(),topLeft->getY(),BOTTOM_RIGHT);
 			this->curves_heuristic(topRight->getX(),topRight->getY(),BOTTOM_LEFT);
-			this->sparse_pixels_heuristic(topLeft->getX(),topLeft->getY(),BOTTOM_RIGHT);
-			this->sparse_pixels_heuristic(topRight->getX(),topRight->getY(),BOTTOM_LEFT);
+			this->sparse_pixels_heuristic(topLeft->getX(),topLeft->getY());
 
 			if(this->weights[topLeft->getX()][topLeft->getY()][BOTTOM_RIGHT] >= this->weights[topRight->getX()][topRight->getY()][BOTTOM_LEFT])
 			{
