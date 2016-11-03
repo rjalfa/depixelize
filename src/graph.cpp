@@ -76,19 +76,80 @@ int Graph::valence(int x,int y)
 	return cnt;
 }
 
-void Graph::curves_heuristic(int x, int y, int DIRECTION)
+
+bool insideBounds(int x, int y, int row_st, int row_end, int col_st, int col_end)
 {
-	
+	return (x>=row_st && x <= row_end && y >= col_st && y <= col_end);
+}
+
+void Graph::curves_heuristic(int x, int y)
+{
+	//Directions are (x,y) BOTTOM_RIGHT, and Right(x,y) BOTTOM_LEFT
+	int featureA = 1;
+	int featureB = 1;
+
+	int p = x, q = y;
+	int dir = BOTTOM_RIGHT;
+	while(valence(p,q) == 2)
+	{
+		featureA++;
+		int i;
+		for(i = dir+1; edges[p][q][i] == false; i = (i+1)%8);
+		if(i == dir) break;
+		dir = i; 
+		p = p + direction[dir][0];
+		q = q + direction[dir][1];
+	}
+
+	p = x+direction[BOTTOM_RIGHT][0];
+	q = y+direction[BOTTOM_RIGHT][1];
+	dir = TOP_LEFT;
+	while(valence(p,q) == 2)
+	{
+		featureA++;
+		int i;
+		for(i = dir+1; edges[p][q][i] == false; i = (i+1)%8);
+		if(i == dir) break;
+		dir = i; 
+		p = p + direction[dir][0];
+		q = q + direction[dir][1];
+	}
+
+	p = x+direction[RIGHT][0];
+	q = y+direction[RIGHT][1];
+	dir = BOTTOM_LEFT;
+	while(valence(x+direction[BOTTOM_RIGHT][0],y+direction[BOTTOM_RIGHT][1]) == 2)
+	{
+		featureB++;
+		int i;
+		for(i = dir+1; edges[p][q][i] == false; i = (i+1)%8);
+		if(i == dir) break;
+		dir = i; 
+		p = p + direction[dir][0];
+		q = q + direction[dir][1];
+	}
+
+	p = x+direction[RIGHT][0] + direction[BOTTOM_LEFT][0];
+	q = y+direction[RIGHT][1] + direction[BOTTOM_LEFT][1];
+	dir = TOP_RIGHT;
+	while(valence(p,q) == 2)
+	{
+		featureB++;
+		int i;
+		for(i = dir+1; edges[p][q][i] == false; i = (i+1)%8);
+		if(i == dir) break;
+		dir = i; 
+		p = p + direction[dir][0];
+		q = q + direction[dir][1];
+	}
+
+	if(featureA < featureB) weights[x+direction[RIGHT][0]][y+direction[RIGHT][1]][BOTTOM_LEFT] += featureB - featureA;
+	else weights[x][y][BOTTOM_RIGHT] += featureA - featureB;
 }
 
 void Graph::islands_heuristic(int x,int y)
 {
 	for(int i = 0; i < 8; i++) if(edges[x][y][i] == true) weights[x][y][i] = 5 * ((valence(x,y) == 1) + (valence(x+direction[BOTTOM_RIGHT][0],y+direction[BOTTOM_RIGHT][1]) == 1));
-}
-
-bool insideBounds(int x, int y, int row_st, int row_end, int col_st, int col_end)
-{
-	return (x>=row_st && x <= row_end && y >= col_st && y <= col_end);
 }
 
 void Graph::sparse_pixels_heuristic(int x, int y)
@@ -173,8 +234,7 @@ void Graph::planarize()
 
 			this->islands_heuristic(topLeft->getX(),topLeft->getY());
 			this->islands_heuristic(topRight->getX(),topRight->getY());
-			this->curves_heuristic(topLeft->getX(),topLeft->getY(),BOTTOM_RIGHT);
-			this->curves_heuristic(topRight->getX(),topRight->getY(),BOTTOM_LEFT);
+			this->curves_heuristic(topLeft->getX(),topLeft->getY());
 			this->sparse_pixels_heuristic(topLeft->getX(),topLeft->getY());
 
 			if(this->weights[topLeft->getX()][topLeft->getY()][BOTTOM_RIGHT] >= this->weights[topRight->getX()][topRight->getY()][BOTTOM_LEFT])

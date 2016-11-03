@@ -23,7 +23,7 @@ class Graph
 	vector<vector<vector<int>>> weights;
 	
 	void removeCross();
-	void curves_heuristic(int,int,int);
+	void curves_heuristic(int,int);
 	void sparse_pixels_heuristic(int,int);
 	void islands_heuristic(int x, int y);
 	int valence(int x,int y);
