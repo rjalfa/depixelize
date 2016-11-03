@@ -36,6 +36,7 @@ class _pixel
         unsigned int getX() {return this->position.first;}
         unsigned int getY() {return this->position.first;}
         bool isSimilar(_pixel& a);
+        void print(ostream& out);
 };	
 
 class Image

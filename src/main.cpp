@@ -5,19 +5,20 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	if(argc < 1)
+	if(argc < 2)
 	{
 		cout << "Usage: ./depixel <<image_path>>\n";
 		return 1;
 	}
 	//Image contains Pixel Data
 	Image inputImage = Image(string(argv[1]));
-
+	
 	//Create Similarity Graph
 	Graph similarity(inputImage); 
 
 	//Planarize the graph
-
+	similarity.planarize();
+	
 	//Create Voronoi diagram for reshaping the pixels
 
 	//Create B-Splines on the end points of Voronoi edges.

@@ -8,7 +8,7 @@ all:main
 
 main:image graph
 	mkdir -p $(OUT)
-	$(CC) -c $(SRC)main.cpp $(OUT)image.o $(OUT)graph.o -o $(OUT)depixel $(CPPFLAGS) -L$(LDFLAGS) -I$(INCLUDE)
+	$(CC) $(SRC)main.cpp $(OUT)image.o $(OUT)graph.o -o $(OUT)depixel $(CPPFLAGS) -L$(LDFLAGS) -I$(INCLUDE)
 
 image:
 	mkdir -p $(OUT)

@@ -1,5 +1,5 @@
 #include "graph.h"
-
+#include <iostream>
 int direction[8][2] = 
 {
 	{-1,-1},
@@ -38,11 +38,9 @@ Graph::Graph(Image& imageI)
 		edges.push_back(v1);
 		weights.push_back(v2);
 	}
-
 	//Add edge if similar color
-	for(int i = 1 ; i < w ; i++) for(int j = 0; j < h; j++) for(int k = 0 ; k < 8; k ++) {
-		if((*image)(i+direction[k][0],j+direction[k][1]) != nullptr)
-			edges[i][j][k] = (*image)(i,j)->isSimilar(*(*image)(i+direction[k][0],j+direction[k][1]));
+	for(int i = 1 ; i < w-1 ; i++) for(int j = 1; j < h-1; j++) for(int k = 0 ; k < 8; k ++) {
+		if((*image)(i+direction[k][0],j+direction[k][1]) != nullptr) edges[i][j][k] = (*image)(i,j)->isSimilar(*(*image)(i+direction[k][0],j+direction[k][1]));
 	}
 }
 
@@ -80,7 +78,7 @@ int Graph::valence(int x,int y)
 
 void Graph::curves_heuristic(int x, int y, int DIRECTION)
 {
-	
+
 }
 
 void Graph::islands_heuristic(int x,int y)

@@ -1,5 +1,5 @@
 #include "image.h"
-
+#include <iostream>
 BMP::BMP(const char* FilePath)
 {
     std::fstream hFile(FilePath, std::ios::in | std::ios::binary);
@@ -43,16 +43,22 @@ _pixel::_pixel(Image* const image_ref, int R, int G, int B, int x, int y)
     this->position = make_pair(x,y);
 }
 
+void _pixel::print(ostream& out)
+{
+    out << "<<(" << position.first << "," << position.second << "):{"<<get<0>(colors)<<","<<get<1>(colors)<<","<<get<2>(colors)<<"}"; 
+}
+
 Image::Image(string file)
 {
     auto data = BMP(file.c_str());
     this->width = data.GetWidth();
     this->height = data.GetHeight();
     for(int i = 0 ; i < width * height; i++) pixels.push_back(_pixel(this,data.GetPixels()[3*i],data.GetPixels()[3*i+1],data.GetPixels()[3*i+2],i%width, i/width));
+    // for(_pixel p : pixels) {p.print(std::cerr);std::cerr << "\n";}
 }
 _pixel* Image::operator()(unsigned int i, unsigned int j)
 {
-    if(i >= 0 && i < width && j >= 0 && j < width) return &pixels[i*width + j];
+    if(i >= 0 && i < width && j >= 0 && j < height) return &pixels[i*width + j];
     else return nullptr;
 }
 
