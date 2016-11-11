@@ -4,6 +4,11 @@
 #include <iostream>
 using namespace std;
 
+void printGraph(Graph g)
+{
+	
+}
+
 int main(int argc, char** argv)
 {
 	if(argc < 2)
@@ -20,6 +25,9 @@ int main(int argc, char** argv)
 	//Planarize the graph
 	similarity.planarize();
 	
+	//Test planarized similarity graph
+	printGraph(similarity);
+
 	//Create Voronoi diagram for reshaping the pixels
 	Voronoi diagram(inputImage);
 	diagram.createDiagram(similarity);
