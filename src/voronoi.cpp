@@ -11,12 +11,32 @@ void Voronoi::createDiagram(Graph& graph)
 	for(int i = 0; i < w; i++) 
 	{
 		vector<vector<pair<bool,int>>> v1;
+		vector<vector<pair<int,int>>> v2;
 		for(int j = 0; j < h; j ++)
 		{
 			v1.push_back(vector<pair<bool,int>>(8,make_pair(false,0)));
+			v2.push_back(vector<pair<int,int>>(8,make_pair(-1,-1)));
 		}
-		weights.push_back(v1);
+		polygons.push_back(v1);
+		voronoiPts.push_back(v2);
 	}
+
+	createRegions();
+}
+
+void Voronoi::createRegions()
+{
+	int i, j, k;
+	for(i = 0; i < graph->getWidth; i++)
+	{
+		for(j = 0; j < graph->getHeight; j++)
+		{
+			
+
+		}
+	}
+
+
 }
 
 void Voronoi::fixBoundaries()
