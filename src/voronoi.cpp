@@ -15,7 +15,8 @@ void Voronoi::createDiagram(Graph& graph)
 		for(int j = 0; j < h; j ++)
 		{
 			v1.push_back(vector<pair<bool,int>>(8,make_pair(false,0)));
-			v2.push_back(vector<pair<int,int>>(8,make_pair(-1,-1)));
+			// v2.push_back(vector<pair<int,int>>(8,make_pair(-1,-1)));
+			v2.push_back(vector<pair<int,int>>());
 		}
 		polygons.push_back(v1);
 		voronoiPts.push_back(v2);
