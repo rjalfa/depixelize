@@ -36,7 +36,7 @@ class _pixel
 	public:
 		_pixel(Image* const image_ref, int R, int G, int B, int x, int y);
         unsigned int getX() {return this->position.first;}
-        unsigned int getY() {return this->position.first;}
+        unsigned int getY() {return this->position.second;}
         bool isSimilar(_pixel& a);
         void print(ostream& out);
 };	
