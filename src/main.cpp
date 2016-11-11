@@ -1,5 +1,6 @@
 #include "image.h"
 #include "graph.h"
+#include "voronoi.h"
 #include <iostream>
 using namespace std;
 
@@ -20,6 +21,8 @@ int main(int argc, char** argv)
 	similarity.planarize();
 	
 	//Create Voronoi diagram for reshaping the pixels
+	Voronoi diagram(inputImage);
+	diagram.createDiagram(similarity);
 
 	//Create B-Splines on the end points of Voronoi edges.
 

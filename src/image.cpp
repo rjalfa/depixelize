@@ -56,6 +56,7 @@ Image::Image(string file)
     for(int i = 0 ; i < width * height; i++) pixels.push_back(_pixel(this,data.GetPixels()[3*i],data.GetPixels()[3*i+1],data.GetPixels()[3*i+2],i%width, i/width));
     // for(_pixel p : pixels) {p.print(std::cerr);std::cerr << "\n";}
 }
+
 _pixel* Image::operator()(unsigned int i, unsigned int j)
 {
     if(i >= 0 && i < width && j >= 0 && j < height) return &pixels[i*width + j];
