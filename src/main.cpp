@@ -6,7 +6,9 @@ using namespace std;
 
 void printGraph(Graph g)
 {
+	cout<<"Printing graph"<<endl;
 	
+
 }
 
 int main(int argc, char** argv)
@@ -29,8 +31,8 @@ int main(int argc, char** argv)
 	printGraph(similarity);
 
 	//Create Voronoi diagram for reshaping the pixels
-	Voronoi diagram(inputImage);
-	diagram.createDiagram(similarity);
+	// Voronoi diagram(inputImage);
+	// diagram.createDiagram(similarity);
 
 	//Create B-Splines on the end points of Voronoi edges.
 

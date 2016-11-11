@@ -1,9 +1,14 @@
 #include "voronoi.h"
 
+int height, width;
+
 void Voronoi::createDiagram(Graph& graph)
 {
 	int h = imageRef->getHeight();
 	int w = imageRef->getWidth();
+
+	height = h;
+	width = w;
 
 	//Semantic
 	// edges[i][j][k] -> denotes whether there is a an edge from (i,j) in kth direction in the graph
@@ -11,12 +16,12 @@ void Voronoi::createDiagram(Graph& graph)
 	for(int i = 0; i < w; i++) 
 	{
 		vector<vector<pair<bool,int>>> v1;
-		vector<vector<pair<int,int>>> v2;
+		vector<vector<pair<float,float>>> v2;
 		for(int j = 0; j < h; j ++)
 		{
 			v1.push_back(vector<pair<bool,int>>(8,make_pair(false,0)));
 			// v2.push_back(vector<pair<int,int>>(8,make_pair(-1,-1)));
-			v2.push_back(vector<pair<int,int>>());
+			v2.push_back(vector<pair<float,float>>(8,make_pair(-1.0,-1.0)));
 		}
 		polygons.push_back(v1);
 		voronoiPts.push_back(v2);
@@ -30,9 +35,9 @@ void Voronoi::createRegions(Graph& graph)
 {
 	int x, y, z;
 	float xcenter, ycenter;
-	for(x = 0; x< graph.getWidth; x++)
+	for(x = 0; x< width; x++)
 	{
-		for(y = 0; y < graph.getHeight; y++)
+		for(y = 0; y < height; y++)
 		{
 			xcenter = x+0.5;
 			ycenter = y = 0.5;
