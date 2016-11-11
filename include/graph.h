@@ -27,9 +27,14 @@ class Graph
 	void sparse_pixels_heuristic(int,int);
 	void islands_heuristic(int x, int y);
 	int valence(int x,int y);
+
 	public:
 		Graph(Image& image);
 		void planarize();
+		bool edge(int x, int y, int k)
+		{
+			return edges[x][y][k];
+		}
 		Graph()
 		{
 			image = nullptr;
