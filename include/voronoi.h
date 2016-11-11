@@ -11,10 +11,11 @@ class Voronoi
 {
 	Image* imageRef;
 	vector<vector<vector<pair<bool,int>>>> polygons;
-	vector<vector<vector<pair<int, int>>>> voronoiPts;
+	vector<vector<pair<float, float>>> voronoiPts;
 	public: 
 		Voronoi(Image& inputImage) { imageRef = &inputImage;}
 		void createDiagram(Graph& graph);
+		void createRegions(Graph& graph);
 		void fixBoundaries();
 };
 
