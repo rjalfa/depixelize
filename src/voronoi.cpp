@@ -22,6 +22,7 @@ void Voronoi::createDiagram(Graph& graph)
 	}
 
 	createRegions(graph);
+	removeUseless();
 }
 
 void Voronoi::createRegions(Graph& graph)
@@ -76,7 +77,7 @@ void Voronoi::createRegions(Graph& graph)
 			}
 
 			// Diagonal edges
-			
+
 			// TOP LEFT
 			if(graph->edge(x,y,TOP_LEFT))
 			{
@@ -178,13 +179,13 @@ void Voronoi::createRegions(Graph& graph)
 					voronoiPts[x][y].push_back(make_pair(xcenter+0.5, ycenter+0.5));
 				}
 			}
-
-
-
 		}
 	}
+}
 
-
+void Voronoi::removeUseless()
+{
+	
 }
 
 void Voronoi::fixBoundaries()

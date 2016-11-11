@@ -16,6 +16,7 @@ class Voronoi
 		Voronoi(Image& inputImage) { imageRef = &inputImage;}
 		void createDiagram(Graph& graph);
 		void createRegions(Graph& graph);
+		void removeUseless();
 		void fixBoundaries();
 };
 
