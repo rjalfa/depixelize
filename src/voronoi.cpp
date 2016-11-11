@@ -29,15 +29,15 @@ void Voronoi::createRegions(Graph& graph)
 {
 	int x, y, z;
 	float xcenter, ycenter;
-	for(x = 0; x< graph->getWidth; x++)
+	for(x = 0; x< graph.getWidth; x++)
 	{
-		for(y = 0; y < graph->getHeight; y++)
+		for(y = 0; y < graph.getHeight; y++)
 		{
 			xcenter = x+0.5;
 			ycenter = y = 0.5;
 
 			// TOP
-			if(graph->edge(x, y,TOP))
+			if(graph.edge(x, y,TOP))
 			{
 				voronoiPts[x][y].push_back(make_pair(xcenter, ycenter-0.5));
 			}
@@ -47,7 +47,7 @@ void Voronoi::createRegions(Graph& graph)
 			}
 
 			// BOTTOM
-			if(graph->edge(x, y,BOTTOM))
+			if(graph.edge(x, y,BOTTOM))
 			{
 				voronoiPts[x][y].push_back(make_pair(xcenter, ycenter+0.5));
 			}
@@ -57,7 +57,7 @@ void Voronoi::createRegions(Graph& graph)
 			}
 
 			// LEFT
-			if(graph->edge(x, y,LEFT))
+			if(graph.edge(x, y,LEFT))
 			{
 				voronoiPts[x][y].push_back(make_pair(xcenter-0.5, ycenter));
 			}
@@ -67,7 +67,7 @@ void Voronoi::createRegions(Graph& graph)
 			}
 
 			// RIGHT
-			if(graph->edge(x, y,RIGHT))
+			if(graph.edge(x, y,RIGHT))
 			{
 				voronoiPts[x][y].push_back(make_pair(xcenter+0.5, ycenter));
 			}
@@ -79,12 +79,12 @@ void Voronoi::createRegions(Graph& graph)
 			// Diagonal edges
 
 			// TOP LEFT
-			if(graph->edge(x,y,TOP_LEFT))
+			if(graph.edge(x,y,TOP_LEFT))
 			{
 				voronoiPts[x][y].push_back(make_pair(xcenter-0.75, ycenter-0.25));
 				voronoiPts[x][y].push_back(make_pair(xcenter-0.25, ycenter-0.75));
 				// top edge and not of left edge or vice versa
-				if((graph->edge(x, y,TOP) && !(graph->edge(x, y,LEFT))) || !(graph->edge(x, y,TOP) && (graph->edge(x, y,LEFT))))
+				if((graph.edge(x, y,TOP) && !(graph.edge(x, y,LEFT))) || !(graph.edge(x, y,TOP) && (graph.edge(x, y,LEFT))))
 				{
 					voronoiPts[x][y].push_back(make_pair(xcenter-0.5, ycenter-0.5));
 				}
@@ -93,7 +93,7 @@ void Voronoi::createRegions(Graph& graph)
 			else
 			{
 				// check if left node is connected to top node (left connected to its own top right node)
-				if(graph->edge(x-1,y,TOP_RIGHT))
+				if(graph.edge(x-1,y,TOP_RIGHT))
 				{
 					voronoiPts[x][y].push_back(make_pair(xcenter-0.25, ycenter-0.25));
 				}
@@ -106,12 +106,12 @@ void Voronoi::createRegions(Graph& graph)
 			// IMPORTANT: IF NO TOP LEFT IS THERE, ADD POINT X,Y TO THE VORONOIPTS(similarly for others)
 
 			// DOWNLEFT
-			if(graph->edge(x,y,BOTTOM_LEFT))
+			if(graph.edge(x,y,BOTTOM_LEFT))
 			{
 				voronoiPts[x][y].push_back(make_pair(xcenter-0.75, ycenter+0.25));
 				voronoiPts[x][y].push_back(make_pair(xcenter-0.25, ycenter+0.75));
 				// Bottom edge and not of left edge or vice versa
-				if((graph->edge(x, y, BOTTOM) && !(graph->edge(x, y,LEFT))) || !(graph->edge(x, y,TOP) && (graph->edge(x, y,LEFT))))
+				if((graph.edge(x, y, BOTTOM) && !(graph.edge(x, y,LEFT))) || !(graph.edge(x, y,TOP) && (graph.edge(x, y,LEFT))))
 				{
 					voronoiPts[x][y].push_back(make_pair(xcenter-0.5, ycenter+0.5));
 				}
@@ -120,7 +120,7 @@ void Voronoi::createRegions(Graph& graph)
 			else
 			{
 				// check if left node is connected to top node (left connected to its own top right node)
-				if(graph->edge(x-1,y,BOTTOM_RIGHT))
+				if(graph.edge(x-1,y,BOTTOM_RIGHT))
 				{
 					voronoiPts[x][y].push_back(make_pair(xcenter-0.25, ycenter+0.25));
 				}
@@ -131,12 +131,12 @@ void Voronoi::createRegions(Graph& graph)
 			}
 
 			// TOP RIGHT
-			if(graph->edge(x,y,TOP_RIGHT))
+			if(graph.edge(x,y,TOP_RIGHT))
 			{
 				voronoiPts[x][y].push_back(make_pair(xcenter+0.75, ycenter-0.25));
 				voronoiPts[x][y].push_back(make_pair(xcenter+0.25, ycenter-0.75));
 				// top edge and not of left edge or vice versa
-				if((graph->edge(x, y,TOP) && !(graph->edge(x, y,RIGHT))) || !(graph->edge(x, y,TOP) && (graph->edge(x, y,RIGHT))))
+				if((graph.edge(x, y,TOP) && !(graph.edge(x, y,RIGHT))) || !(graph.edge(x, y,TOP) && (graph.edge(x, y,RIGHT))))
 				{
 					voronoiPts[x][y].push_back(make_pair(xcenter+0.5, ycenter-0.5));
 				}
@@ -145,7 +145,7 @@ void Voronoi::createRegions(Graph& graph)
 			else
 			{
 				// check if top node is connected to right node (top connected to its own bottom right node)
-				if(graph->edge(x,y-1,BOTTOM_RIGHT))
+				if(graph.edge(x,y-1,BOTTOM_RIGHT))
 				{
 					voronoiPts[x][y].push_back(make_pair(xcenter+0.25, ycenter-0.25));
 				}
@@ -156,12 +156,12 @@ void Voronoi::createRegions(Graph& graph)
 			}
 
 			// DOWNRIGHT
-			if(graph->edge(x,y,BOTTOM_RIGHT))
+			if(graph.edge(x,y,BOTTOM_RIGHT))
 			{
 				voronoiPts[x][y].push_back(make_pair(xcenter+0.75, ycenter+0.25));
 				voronoiPts[x][y].push_back(make_pair(xcenter+0.25, ycenter+0.75));
 				// Bottom edge and not of right edge or vice versa
-				if((graph->edge(x, y, BOTTOM) && !(graph->edge(x, y,RIGHT))) || !(graph->edge(x, y,TOP) && (graph->edge(x, y,RIGHT))))
+				if((graph.edge(x, y, BOTTOM) && !(graph.edge(x, y,RIGHT))) || !(graph.edge(x, y,TOP) && (graph.edge(x, y,RIGHT))))
 				{
 					voronoiPts[x][y].push_back(make_pair(xcenter+0.5, ycenter+0.5));
 				}
@@ -170,7 +170,7 @@ void Voronoi::createRegions(Graph& graph)
 			else
 			{
 				// check if bottom node is connected to right node (bottom connected to its own top right node)
-				if(graph->edge(x,y+1,TOP_RIGHT))
+				if(graph.edge(x,y+1,TOP_RIGHT))
 				{
 					voronoiPts[x][y].push_back(make_pair(xcenter+0.25, ycenter+0.25));
 				}
