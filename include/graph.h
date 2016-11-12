@@ -23,7 +23,8 @@ class Graph
 		void planarize();
 		bool edge(int x, int y, int k)
 		{
-			return edges[x][y][k];
+			if(x >= 0 && x < image->getWidth() && y >= 0 && y < image->getHeight() && k >= 0 && k < 8) return edges[x][y][k];
+			else return false;
 		}
 		Graph()
 		{

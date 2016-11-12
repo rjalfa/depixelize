@@ -65,7 +65,6 @@ void Voronoi::createRegions(Graph& graph)
 				if(graph.edge(x-1,y,TOP_RIGHT))	voronoiPts[x][y].push_back(make_pair(xcenter-0.25, ycenter-0.25));
 				else voronoiPts[x][y].push_back(make_pair(xcenter-0.5, ycenter-0.5));
 			}
-
 			// IMPORTANT: IF NO TOP LEFT IS THERE, ADD POINT X,Y TO THE VORONOIPTS(similarly for others)
 
 			// DOWNLEFT
@@ -112,9 +111,6 @@ void Voronoi::createRegions(Graph& graph)
 				if(graph.edge(x,y+1,TOP_RIGHT)) voronoiPts[x][y].push_back(make_pair(xcenter+0.25, ycenter+0.25));
 				else voronoiPts[x][y].push_back(make_pair(xcenter+0.5, ycenter+0.5));
 			}
-			cout << voronoiPts[x][y] << endl;
-			cout << x << " " << y << endl;
-			
 		}
 	}
 }
