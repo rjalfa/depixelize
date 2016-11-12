@@ -26,7 +26,16 @@ void Voronoi::createDiagram(Graph& graph)
 
 void Voronoi::printVoronoi()
 {
-	
+
+	cout<<"\nImage height = "<<height<<"\tImage width = "<<width;
+	for(int i=20; i <height; i++)
+	{
+		for(int j=0; j< width; j++)
+		{
+			cout<<"voronoi["<<i<<"]["<<j<<"] = "<<voronoiPts[i][j]<<"\n";
+		}
+	}
+
 }
 
 void Voronoi::createRegions(Graph& graph)

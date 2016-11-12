@@ -16,6 +16,7 @@ class Voronoi
 		void createRegions(Graph& graph);
 		void removeUseless();
 		void fixBoundaries();
+		void printVoronoi();
 };
 
 #endif
