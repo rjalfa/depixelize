@@ -3,13 +3,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include <cstdio>
-#include <tuple>
-#include <utility>
-#include <fstream>
-#include <vector>
+#include "common.h"
 
-using namespace std;
 class Image;
 
 // Source: http://stackoverflow.com/questions/20595340/loading-a-tga-bmp-file-in-c-opengl

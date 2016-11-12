@@ -1,5 +1,4 @@
 #include "graph.h"
-#include <iostream>
 int direction[8][2] = 
 {
 	{-1,-1},

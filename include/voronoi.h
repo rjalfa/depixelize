@@ -2,10 +2,8 @@
 
 #ifndef _VORONOI_H
 #define _VORONOI_H
+#include "common.h"
 #include "graph.h"
-#include <vector>
-#include <utility>
-using namespace std;
 
 class Voronoi
 {

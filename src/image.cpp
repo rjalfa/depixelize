@@ -1,5 +1,4 @@
 #include "image.h"
-#include <iostream>
 BMP::BMP(const char* FilePath)
 {
     std::fstream hFile(FilePath, std::ios::in | std::ios::binary);

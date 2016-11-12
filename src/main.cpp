@@ -1,13 +1,12 @@
+#include "common.h"
 #include "image.h"
 #include "graph.h"
 #include "voronoi.h"
-#include <iostream>
 using namespace std;
 
-void printGraph(Graph g)
+void printGraph(Graph& g)
 {
 	cout<<"Printing graph"<<endl;
-	
 
 }
 
@@ -31,8 +30,8 @@ int main(int argc, char** argv)
 	printGraph(similarity);
 
 	//Create Voronoi diagram for reshaping the pixels
-	// Voronoi diagram(inputImage);
-	// diagram.createDiagram(similarity);
+	Voronoi diagram(inputImage);
+	diagram.createDiagram(similarity);
 
 	//Create B-Splines on the end points of Voronoi edges.
 

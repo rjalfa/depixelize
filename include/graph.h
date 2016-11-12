@@ -3,18 +3,8 @@
 #ifndef _GRAPH_H
 #define _GRAPH_H
 
+#include "common.h"
 #include "image.h"
-#include <stack>
-using namespace std;
-//DIRECTION MACROS
-#define TOP 1
-#define TOP_RIGHT 2
-#define TOP_LEFT 0
-#define LEFT 3
-#define RIGHT 4
-#define BOTTOM 6
-#define BOTTOM_RIGHT 7
-#define BOTTOM_LEFT 5
 
 class Graph
 {
