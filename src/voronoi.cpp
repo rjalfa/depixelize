@@ -24,6 +24,11 @@ void Voronoi::createDiagram(Graph& graph)
 	removeUseless();
 }
 
+void Voronoi::printVoronoi()
+{
+	
+}
+
 void Voronoi::createRegions(Graph& graph)
 {
 	int x, y, z;
