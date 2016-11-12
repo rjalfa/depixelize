@@ -26,6 +26,10 @@ class Graph
 			if(x >= 0 && x < image->getWidth() && y >= 0 && y < image->getHeight() && k >= 0 && k < 8) return edges[x][y][k];
 			else return false;
 		}
+		vector<vector<vector<int>>> getEdges()
+		{
+			return weights;
+		}
 		Graph()
 		{
 			image = nullptr;
