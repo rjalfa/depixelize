@@ -101,6 +101,7 @@ int main(int argc, char** argv)
 	//Create Voronoi diagram for reshaping the pixels
 	//Voronoi diagram(inputImage);
 	//diagram.createDiagram(similarity);
+
 	//diagram.printVoronoi();
 
 	//Create B-Splines on the end points of Voronoi edges.

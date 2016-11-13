@@ -24,6 +24,16 @@ void Voronoi::createDiagram(Graph& graph)
 	removeUseless();
 }
 
+int Voronoi::valence(int x,int y)
+{
+	if(x < 0 || x >= this->image->getWidth()) return -1;
+	if(y < 0 || y >= this->image->getHeight()) return -1;
+
+	int cnt = 0;
+	for(int i = 0; i < 8 ; i++) if(voronoiPts[x][y][i] == true) cnt ++;
+	return cnt;
+}
+
 void Voronoi::printVoronoi()
 {
 
@@ -33,6 +43,23 @@ void Voronoi::printVoronoi()
 		for(int j=0; j< height; j++)
 		{
 			cout<<"voronoi["<<i<<"]["<<j<<"] = "<<voronoiPts[i][j]<<"\n";
+		}
+	}
+
+}
+
+void Voronoi::collapseValence2()
+{
+
+	for(int i=0; i <width; i++)
+	{
+		for(int j=0; j< height; j++)
+		{
+			if(valence(i,j) != 2)
+			{
+
+			}
+
 		}
 	}
 
@@ -127,6 +154,8 @@ void Voronoi::createRegions(Graph& graph)
 			}
 		}
 	}
+
+	collapseValence2();
 }
 
 void Voronoi::removeUseless()
