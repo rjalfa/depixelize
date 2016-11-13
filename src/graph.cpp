@@ -1,15 +1,4 @@
 #include "graph.h"
-int direction[8][2] = 
-{
-	{-1,-1},
-	{-1,0},
-	{-1,1},
-	{0,-1},
-	{0,1},
-	{1,-1},
-	{1,0},
-	{1,1}
-};
 
 bool isValid(int x,int y, int w, int h)
 {
@@ -38,7 +27,7 @@ Graph::Graph(Image& imageI)
 		weights.push_back(v2);
 	}
 	//Add edge if similar color
-	for(int i = 1 ; i < w-1 ; i++) for(int j = 1; j < h-1; j++) for(int k = 0 ; k < 8; k ++) {
+	for(int i = 0 ; i < w ; i++) for(int j = 0; j < h; j++) for(int k = 0 ; k < 8; k ++) {
 		if((*image)(i+direction[k][0],j+direction[k][1]) != nullptr) edges[i][j][k] = (*image)(i,j)->isSimilar(*(*image)(i+direction[k][0],j+direction[k][1]));
 	}
 }
@@ -71,7 +60,7 @@ int Graph::valence(int x,int y)
 	if(y < 0 || y >= this->image->getHeight()) return -1;
 
 	int cnt = 0;
-	for(int i = 0; i < 8 ; i++) if(edges[x][y][i] == true) cnt ++ ;
+	for(int i = 0; i < 8 ; i++) if(edges[x][y][i] == true) cnt ++;
 	return cnt;
 }
 
@@ -94,8 +83,8 @@ void Graph::curves_heuristic(int x, int y)
 		featureA++;
 		int i;
 		for(i = dir+1; edges[p][q][i] == false; i = (i+1)%8);
-		if(i == dir) break;
-		dir = i; 
+		if((i+dir)==7) break;
+		dir = i;
 		p = p + direction[dir][0];
 		q = q + direction[dir][1];
 	}
@@ -108,7 +97,7 @@ void Graph::curves_heuristic(int x, int y)
 		featureA++;
 		int i;
 		for(i = dir+1; edges[p][q][i] == false; i = (i+1)%8);
-		if(i == dir) break;
+		if((i+dir)==7) break;
 		dir = i; 
 		p = p + direction[dir][0];
 		q = q + direction[dir][1];
@@ -117,13 +106,13 @@ void Graph::curves_heuristic(int x, int y)
 	p = x+direction[RIGHT][0];
 	q = y+direction[RIGHT][1];
 	dir = BOTTOM_LEFT;
-	while(valence(x+direction[BOTTOM_RIGHT][0],y+direction[BOTTOM_RIGHT][1]) == 2)
+	while(valence(p,q) == 2)
 	{
 		featureB++;
 		int i;
 		for(i = dir+1; edges[p][q][i] == false; i = (i+1)%8);
-		if(i == dir) break;
-		dir = i; 
+		if((i+dir)==7) break;
+		dir = i;
 		p = p + direction[dir][0];
 		q = q + direction[dir][1];
 	}
@@ -136,19 +125,30 @@ void Graph::curves_heuristic(int x, int y)
 		featureB++;
 		int i;
 		for(i = dir+1; edges[p][q][i] == false; i = (i+1)%8);
-		if(i == dir) break;
-		dir = i; 
+		if((i+dir)==7) break;
+		dir = i;
 		p = p + direction[dir][0];
 		q = q + direction[dir][1];
 	}
 
-	if(featureA < featureB) weights[x+direction[RIGHT][0]][y+direction[RIGHT][1]][BOTTOM_LEFT] += featureB - featureA;
-	else weights[x][y][BOTTOM_RIGHT] += featureA - featureB;
+	if(featureA < featureB) {
+		weights[x+direction[RIGHT][0]][y+direction[RIGHT][1]][BOTTOM_LEFT] += 10*(featureB - featureA);
+		weights[x+direction[BOTTOM][0]][y+direction[BOTTOM][1]][TOP_RIGHT] += 10*(featureB - featureA);
+	}
+	else 
+	{
+		weights[x][y][BOTTOM_RIGHT] += (featureA - featureB);
+		weights[x+direction[BOTTOM_RIGHT][0]][y+direction[BOTTOM_RIGHT][1]][TOP_LEFT] += (featureA - featureB);
+	}
 }
 
 void Graph::islands_heuristic(int x,int y)
 {
-	for(int i = 0; i < 8; i++) if(edges[x][y][i] == true) weights[x][y][i] = 5 * ((valence(x,y) == 1) + (valence(x+direction[BOTTOM_RIGHT][0],y+direction[BOTTOM_RIGHT][1]) == 1));
+	for(int i = 0; i < 8; i++) if(edges[x][y][i] == true) 
+	{
+		weights[x][y][i] = 5 * ((valence(x,y) == 1) + (valence(x+direction[BOTTOM_RIGHT][0],y+direction[BOTTOM_RIGHT][1]) == 1));
+		weights[x+direction[i][0]][y+direction[i][1	]][7-i] = 5 * ((valence(x,y) == 1) + (valence(x+direction[BOTTOM_RIGHT][0],y+direction[BOTTOM_RIGHT][1]) == 1));
+	}
 }
 
 void Graph::sparse_pixels_heuristic(int x, int y)
@@ -205,8 +205,16 @@ void Graph::sparse_pixels_heuristic(int x, int y)
 		if(labels[i][j] == 1) componentA++;
 		else if(labels[i][j] == 2) componentB++;
 	}
-	if(componentA > componentB) weights[x+direction[RIGHT][0]][y+direction[RIGHT][1]][BOTTOM_LEFT] += componentA - componentB;
-	else weights[x][y][BOTTOM_RIGHT] += componentB - componentA;
+	if(componentA > componentB) 
+	{
+		weights[x+direction[RIGHT][0]][y+direction[RIGHT][1]][BOTTOM_LEFT] += (componentA-componentB);
+		weights[x+direction[BOTTOM][0]][y+direction[BOTTOM][1]][TOP_RIGHT] += (componentA-componentB);
+	}
+	else 
+	{
+		weights[x][y][BOTTOM_RIGHT] += (componentB-componentA);
+		weights[x+direction[BOTTOM_RIGHT][0]][y+direction[BOTTOM_RIGHT][1]][TOP_LEFT] += (componentB-componentA);
+	}
 }
 
 void Graph::planarize()
@@ -221,7 +229,7 @@ void Graph::planarize()
 		_pixel* topRight = (*this->image)(i+direction[RIGHT][0],j+direction[RIGHT][1]);
 		_pixel* bottomLeft = (*this->image)(i+direction[BOTTOM][0],j+direction[BOTTOM][1]);
 		_pixel* bottomRight = (*this->image)(i+direction[BOTTOM_RIGHT][0],j+direction[BOTTOM_RIGHT][1]);
-		
+		assert(topLeft != nullptr && topRight != nullptr && bottomLeft != nullptr && bottomRight != nullptr);
 		if(this->edges[topLeft->getX()][topLeft->getY()][BOTTOM_RIGHT] == true && this->edges[topRight->getX()][topRight->getY()][BOTTOM_LEFT] == true)
 		{
 			//Edges are crossing and the pixels are dissimilar, need to discard atleast one.
@@ -230,21 +238,20 @@ void Graph::planarize()
 			if(this->edges[topLeft->getX()][topLeft->getY()][RIGHT]) continue;
 			if(this->edges[bottomRight->getX()][bottomRight->getY()][TOP]) continue;
 			if(this->edges[bottomRight->getX()][bottomRight->getY()][LEFT]) continue;
-
 			this->islands_heuristic(topLeft->getX(),topLeft->getY());
 			this->islands_heuristic(topRight->getX(),topRight->getY());
 			this->curves_heuristic(topLeft->getX(),topLeft->getY());
 			this->sparse_pixels_heuristic(topLeft->getX(),topLeft->getY());
 
-			if(this->weights[topLeft->getX()][topLeft->getY()][BOTTOM_RIGHT] >= this->weights[topRight->getX()][topRight->getY()][BOTTOM_LEFT])
-			{
-				this->weights[topLeft->getX()][topLeft->getY()][BOTTOM_RIGHT] = false;
-				this->weights[bottomRight->getX()][bottomRight->getY()][TOP_LEFT] = false;	
-			}
 			if(this->weights[topLeft->getX()][topLeft->getY()][BOTTOM_RIGHT] <= this->weights[topRight->getX()][topRight->getY()][BOTTOM_LEFT])
 			{
-				this->weights[topRight->getX()][topRight->getY()][BOTTOM_LEFT] = false;
-				this->weights[bottomLeft->getX()][bottomLeft->getY()][TOP_RIGHT] = false;	
+				this->edges[topLeft->getX()][topLeft->getY()][BOTTOM_RIGHT] = false;
+				this->edges[bottomRight->getX()][bottomRight->getY()][TOP_LEFT] = false;	
+			}
+			if(this->weights[topLeft->getX()][topLeft->getY()][BOTTOM_RIGHT] >= this->weights[topRight->getX()][topRight->getY()][BOTTOM_LEFT])
+			{
+				this->edges[topRight->getX()][topRight->getY()][BOTTOM_LEFT] = false;
+				this->edges[bottomLeft->getX()][bottomLeft->getY()][TOP_RIGHT] = false;	
 			}
 		}	
 	}

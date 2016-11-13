@@ -56,10 +56,13 @@ Image::Image(string file)
     this->width = data.GetWidth();
     this->height = data.GetHeight();
     long off = 0;
-    for(int i = 0 ; i < width * height; i++) {
-        pixels.push_back(_pixel(this,data.GetPixels()[off+2],data.GetPixels()[off],data.GetPixels()[off+1],i%width, i/width));
+    int row = 0, col=0;
+    while(off < data.GetPixels().size())
+    {
+        pixels.push_back(_pixel(this,data.GetPixels()[off+2],data.GetPixels()[off+1],data.GetPixels()[off],row,col));
         off += 3;
-        if(i%width == width-1) off += 2;
+        row = (row + 1) % width;
+        if(row == 0) {off += 2;col = (col + 1)%height;}
     }
     assert(off== data.GetPixels().size());
 }
@@ -67,10 +70,10 @@ Image::Image(string file)
 _pixel* Image::operator()(unsigned int i, unsigned int j)
 {
     if(i >= 0 && i < width && j >= 0 && j < height) return &pixels[i+ j*width];
-    else {cout << i <<" " << j << " Requeted, but no pixel\n";return nullptr;}
+    else return nullptr;
 }
 
 bool _pixel::isSimilar(_pixel& a)
 {
-    return (abs((unsigned int)(get<0>(this->colors)-get<0>(a.colors)) <= 0.1))&&(abs((unsigned int)(get<1>(this->colors)-get<1>(a.colors)) <= 0.1))&&(abs((unsigned int)(get<2>(this->colors)-get<2>(a.colors)) <= 0.1));
+    return (abs((unsigned int)(get<0>(this->colors)-get<0>(a.colors))==0))&&(abs((unsigned int)(get<1>(this->colors)-get<1>(a.colors))==0))&&(abs((unsigned int)(get<2>(this->colors)-get<2>(a.colors))==0));
 }

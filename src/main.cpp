@@ -5,6 +5,7 @@
 using namespace std;
 
 Image* gImage = nullptr;
+Graph* gSimilarity = nullptr;
 int majorwindow;
 void printGraph(Graph& g)
 {
@@ -56,6 +57,18 @@ void display()
 		glVertex2f(convCoordX(IMAGE_SCALE*x), convCoordY(IMAGE_SCALE*(y+1)));
 	}
 	glEnd();
+	for(int x = 0 ; x < gImage->getWidth(); x++)
+	for(int y = 0 ; y < gImage->getHeight(); y++)
+	{
+		for(int k = 0 ; k < 8; k++) if(gSimilarity->edge(x,y,k))
+		{
+			glBegin(GL_LINES);
+			glColor3f(0.0,0.0,1.0);
+			glVertex2f(convCoordX(IMAGE_SCALE*(x+0.5)), convCoordY(IMAGE_SCALE*(y+0.5)));
+			glVertex2f(convCoordX(IMAGE_SCALE*(x+0.5+direction[k][0])), convCoordY(IMAGE_SCALE*(y+0.5+direction[k][1])));
+			glEnd();
+		}
+	}
 	glutSwapBuffers();
 }
 
@@ -78,7 +91,7 @@ int main(int argc, char** argv)
 
 	//Create Similarity Graph
 	Graph similarity(inputImage); 
-
+	gSimilarity = &similarity;
 	//Planarize the graph
 	similarity.planarize();
 	
@@ -86,8 +99,8 @@ int main(int argc, char** argv)
 	//printGraph(similarity);
 
 	//Create Voronoi diagram for reshaping the pixels
-	Voronoi diagram(inputImage);
-	diagram.createDiagram(similarity);
+	//Voronoi diagram(inputImage);
+	//diagram.createDiagram(similarity);
 	//diagram.printVoronoi();
 
 	//Create B-Splines on the end points of Voronoi edges.

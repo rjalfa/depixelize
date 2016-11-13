@@ -2,7 +2,7 @@ CPPFLAGS= -std=c++11
 LDFLAGS = -lglut -lGL -lGLEW
 OUT = build/
 INCLUDE = include/
-CC= g++
+CC= g++ -g
 SRC= src/
 all:main
 

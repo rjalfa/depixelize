@@ -27,8 +27,17 @@ using namespace std;
 #define BOTTOM_RIGHT 7
 #define BOTTOM_LEFT 5
 
-extern int directions[8][2];
-
+const int direction[8][2] = 
+{
+	{-1,-1},
+	{-1,0},
+	{-1,1},
+	{0,-1},
+	{0,1},
+	{1,-1},
+	{1,0},
+	{1,1}
+};
 
 template<class T,class V>
 ostream& operator<<(ostream& out, pair<T,V>& p)
