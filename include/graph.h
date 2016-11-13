@@ -20,6 +20,7 @@ class Graph
 
 	public:
 		Graph(Image& image);
+		Image* getImage() {return image;}
 		void planarize();
 		bool edge(int x, int y, int k)
 		{

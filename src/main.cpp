@@ -4,25 +4,24 @@
 #include "voronoi.h"
 using namespace std;
 
-void printGraph(Graph g, Image img)
+void printGraph(Graph& g)
 {
 	cout<<"Printing graph"<<endl;
-	int width = img.getWidth();
-	int height = img.getHeight();
+	Image* img = g.getImage();
+	int width = img->getWidth();
+	int height = img->getHeight();
 	cout<<"(height, width) = ("<<height<<", "<<width<<")\n";
-	vector<vector<vector<int>>> edges = g.getEdges();
-	for(int i = 0; i < height; i++)
+	for(int i = 0; i < width; i++)
 	{
-		for(int j = 0; j < width; j++)
+		for(int j = 0; j < height; j++)
 		{
 			for(int k = 0;k<8; k++)
 			{
-				cout<<"("<<i<<","<<j<<","<<k<<") = "<<edges[i][j][k]<<"\t";
+				cout<<"("<<i<<","<<j<<","<<k<<") = "<<g.edge(i,j,k)<<"\t";
 			}
 			cout<<"\n";
 		}
 	}
-
 }
 
 int main(int argc, char** argv)
@@ -42,7 +41,7 @@ int main(int argc, char** argv)
 	similarity.planarize();
 	
 	//Test planarized similarity graph
-	// printGraph(similarity, inputImage);
+	printGraph(similarity);
 
 	//Create Voronoi diagram for reshaping the pixels
 	Voronoi diagram(inputImage);
