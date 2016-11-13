@@ -1,5 +1,5 @@
 CPPFLAGS= -std=c++11
-LDFLAGS = 
+LDFLAGS = -lglut -lGL -lGLEW
 OUT = build/
 INCLUDE = include/
 CC= g++
@@ -8,23 +8,23 @@ all:main
 
 main:common image graph voronoi
 	mkdir -p $(OUT)
-	$(CC) $(SRC)main.cpp $(OUT)common.o $(OUT)image.o $(OUT)graph.o $(OUT)voronoi.o -o $(OUT)depixel $(CPPFLAGS) -I$(INCLUDE)
+	$(CC) $(SRC)main.cpp $(OUT)common.o $(OUT)image.o $(OUT)graph.o $(OUT)voronoi.o -o $(OUT)depixel $(CPPFLAGS) -I$(INCLUDE) $(LDFLAGS)
 
 image:common
 	mkdir -p $(OUT)
-	$(CC) -c $(SRC)image.cpp -o $(OUT)image.o $(CPPFLAGS) -I$(INCLUDE)
+	$(CC) -c $(SRC)image.cpp -o $(OUT)image.o $(CPPFLAGS) -I$(INCLUDE) $(LDFLAGS)
 
 graph:common
 	mkdir -p $(OUT)
-	$(CC) -c $(SRC)graph.cpp -o $(OUT)graph.o $(CPPFLAGS) -I$(INCLUDE)
+	$(CC) -c $(SRC)graph.cpp -o $(OUT)graph.o $(CPPFLAGS) -I$(INCLUDE) $(LDFLAGS)
 
 voronoi:common
 	mkdir -p $(OUT)
-	$(CC) -c $(SRC)voronoi.cpp -o $(OUT)voronoi.o $(CPPFLAGS) -I$(INCLUDE)
+	$(CC) -c $(SRC)voronoi.cpp -o $(OUT)voronoi.o $(CPPFLAGS) -I$(INCLUDE) $(LDFLAGS)
 
 common:
 	mkdir -p $(OUT)
-	$(CC) -c $(SRC)common.cpp -o $(OUT)common.o $(CPPFLAGS) -I$(INCLUDE)	
+	$(CC) -c $(SRC)common.cpp -o $(OUT)common.o $(CPPFLAGS) -I$(INCLUDE) $(LDFLAGS)	
 
 clean:
 	rm -rf $(OUT)

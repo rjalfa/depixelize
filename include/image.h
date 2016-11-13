@@ -32,6 +32,7 @@ class _pixel
 		_pixel(Image* const image_ref, int R, int G, int B, int x, int y);
         unsigned int getX() {return this->position.first;}
         unsigned int getY() {return this->position.second;}
+        tuple<unsigned int,unsigned int,unsigned int> getColor() {return this->colors;};    
         bool isSimilar(_pixel& a);
         void print(ostream& out);
 };	

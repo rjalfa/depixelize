@@ -10,6 +10,11 @@
 #include <vector>
 #include <iostream>
 #include <stack>
+#include <cassert>
+#include <GL/glew.h>
+#include <GL/glui.h>
+#include <GL/gl.h>
+#include <GL/freeglut.h>
 using namespace std;
 
 //DIRECTION MACROS
