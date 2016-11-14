@@ -158,7 +158,7 @@ void Voronoi::createRegions(Graph& graph)
 	}
 
 	// collapseValence2();			// removing useless points in the voronoi
-	convex_hull();				// get all the convex hull points
+	convex_hull();					// get all the convex hull points
 	// fixBoundaries()				//fix boundaries
 }
 
