@@ -19,6 +19,7 @@ void Voronoi::createDiagram(Graph& graph)
 		for(int j = 0; j < h; j ++) v1.push_back(vector<pair<bool,int>>(8,make_pair(false,0)));
 		polygons.push_back(v1);
 		voronoiPts.push_back(v2);
+
 	}
 	createRegions(graph);
 	removeUseless();
@@ -26,12 +27,12 @@ void Voronoi::createDiagram(Graph& graph)
 
 int Voronoi::valence(int x,int y)
 {
-	if(x < 0 || x >= this->image->getWidth()) return -1;
-	if(y < 0 || y >= this->image->getHeight()) return -1;
+	// if(x < 0 || x >= this->image->getWidth()) return -1;
+	// if(y < 0 || y >= this->image->getHeight()) return -1;
 
-	int cnt = 0;
-	for(int i = 0; i < 8 ; i++) if(voronoiPts[x][y][i] == true) cnt ++;
-	return cnt;
+	// int cnt = 0;
+	// for(int i = 0; i < 8 ; i++) if(voronoiPts[x][y][i] == true) cnt ++;
+	// return cnt;
 }
 
 void Voronoi::printVoronoi()
@@ -62,8 +63,8 @@ void Voronoi::collapseValence2()
 
 		}
 	}
-
 }
+
 
 void Voronoi::createRegions(Graph& graph)
 {
@@ -155,7 +156,24 @@ void Voronoi::createRegions(Graph& graph)
 		}
 	}
 
-	collapseValence2();
+	// collapseValence2();			// removing useless points in the voronoi
+	// convex_hull();				// get all the convex hull points
+	// fixBoundaries()				//fix boundaries
+}
+
+void Voronoi::convex_hull()
+{
+
+
+	for(int x = 0; x< width; x++)
+	{
+		for(int y = 0; y < height; y++)
+		{
+			voronoiPts[i][j]
+
+		}
+	}
+
 }
 
 void Voronoi::removeUseless()

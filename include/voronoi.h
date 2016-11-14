@@ -18,6 +18,9 @@ class Voronoi
 		void removeUseless();
 		void fixBoundaries();
 		void printVoronoi();
+		void collapseValence2();
+		int collapseValence2nce(int x, int y);
+		void convex_hull();
 };
 
 #endif
