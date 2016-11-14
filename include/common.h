@@ -9,6 +9,7 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 #include <stack>
 #include <cassert>
 #include <GL/glew.h>
@@ -53,10 +54,25 @@ ostream& operator<<(ostream& out, vector<T> v)
 	for(int i = 0 ; i < v.size() ; i++)
 	{
 		out << v[i];
-		if(i < v.size() - 1 ) out << ", ";
+		if(i < v.size()-1) out << ", ";
 	}
 	out << "]";
 	return out;
 }
+
+
+typedef double coord_t;         // coordinate type
+typedef double coord2_t;  // must be big enough to hold 2*max(|coordinate|)^2
+
+struct Point {
+	coord_t x, y;
+public:
+	Point(coord_t _x,coord_t _y) {x=_x;y=_y;}
+	Point():x(0),y(0) {}
+	bool operator <(const Point &p) const {
+		return x < p.x || (x == p.x && y < p.y);
+	}
+};
+vector<Point> convex_hull(vector<Point> P);
 
 #endif

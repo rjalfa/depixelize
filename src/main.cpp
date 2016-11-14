@@ -6,6 +6,7 @@ using namespace std;
 
 Image* gImage = nullptr;
 Graph* gSimilarity = nullptr;
+
 int majorwindow;
 void printGraph(Graph& g)
 {
@@ -69,6 +70,11 @@ void display()
 			glEnd();
 		}
 	}
+	for(int x = 0 ; x < gImage->getWidth(); x++)
+	for(int y = 0 ; y < gImage->getHeight(); y++)
+	{
+			
+	}
 	glutSwapBuffers();
 }
 
@@ -103,7 +109,7 @@ int main(int argc, char** argv)
 	//Create Voronoi diagram for reshaping the pixels
 	Voronoi diagram(inputImage);
 	diagram.createDiagram(similarity);
-
+	voronoiPts = diagram.getVoronoi();
 	diagram.printVoronoi();
 
 	//Create B-Splines on the end points of Voronoi edges.

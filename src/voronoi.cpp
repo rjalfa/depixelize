@@ -164,8 +164,6 @@ void Voronoi::createRegions(Graph& graph)
 
 void Voronoi::convex_hull()
 {
-
-
 	for(int x = 0; x< width; x++)
 	{
 		for(int y = 0; y < height; y++)
@@ -174,47 +172,12 @@ void Voronoi::convex_hull()
 			cout<<"\nvoronoi["<<x<<"]["<<y<<"] = "<<voronoiPts[x][y]<<"\n";
 
 			vector<pair<float, float>> hull;
-
-			int left = 0; 					//leftmost point 
-			for(int z = 0; z < 8; z++)
-			{
-				if(voronoiPts[x][y][z].first < voronoiPts[x][y][left].first)
-				{
-					left = z;
-				}
-			}
-
-			int p =left, q;
-			do{
-				hull.push_back(make_pair(voronoiPts[x][y][p].first, voronoiPts[x][y][p].second));
-
-				q = (p+1)%8;
-
-				for(int i = 0; i < 8; i++)
-				{
-					// check orientation of each 
-					int orient = 0;
-					float val = (voronoiPts[x][y][i].second - voronoiPts[x][y][p].second)*(voronoiPts[x][y][q].first - voronoiPts[x][y][i].first) - (voronoiPts[x][y][i].first - voronoiPts[x][y][p].first)*(voronoiPts[x][y][q].second - voronoiPts[x][y][i].second);
-					if (val == 0.0) 
-						orient = 0;						  // colinear
-					else if(val > 0.0)
-						orient = 1;						  // cloclwise
-					else
-						orient = 2;						  // counterclockwise
-
-					if(orient == 2)
-					{
-						q = i;
-					}
-
-				}
-				p = q;
-
-			}while(p!=left);
-
+			vector<Point> Pts;
+			for(pair<float,float> p : voronoiPts[x][y]) Pts.push_back(Point(p.first,p.second));
+			vector<Point> hullPts = ::convex_hull(Pts);
+			for(Point p : hullPts) hull.push_back(make_pair(p.x,p.y));
 			for (int i = 0; i < hull.size(); i++)
         		cout << "(" << hull[i].first << ", "<< hull[i].second << ")\n";
-
 		}
 	}
 
