@@ -62,7 +62,6 @@ void Voronoi::collapseValence2()
 			{
 
 			}
-
 		}
 	}
 }
@@ -170,7 +169,7 @@ void Voronoi::convex_hull()
 		for(int y = 0; y < height; y++)
 		{
 
-			cout<<"\nvoronoi["<<x<<"]["<<y<<"] = "<<voronoiPts[x][y]<<"\n";
+			//cout<<"\nvoronoi["<<x<<"]["<<y<<"] = "<<voronoiPts[x][y]<<"\n";
 
 			vector<Point> Pts;
 			for(pair<float,float> p : voronoiPts[x][y]) Pts.push_back(Point(p.first,p.second));

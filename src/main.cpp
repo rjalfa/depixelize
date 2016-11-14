@@ -44,6 +44,8 @@ void display()
 	glClearColor(1.0,1.0,1.0,0.0);
 	float IMAGE_SCALE = 4.0f;
 	glBegin(GL_QUADS);
+	
+	//Print Image 
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
@@ -58,6 +60,8 @@ void display()
 		glVertex2f(convCoordX(IMAGE_SCALE*x), convCoordY(IMAGE_SCALE*(y+1)));
 	}
 	glEnd();
+
+	// Print Similarity
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
@@ -70,6 +74,7 @@ void display()
 			glEnd();
 		}
 	}
+	
 	//Draws Voronoi Points 
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
@@ -80,6 +85,7 @@ void display()
 		for(pair<float,float> pt : (*gDiagram)(x,y)) glVertex2f(convCoordX(IMAGE_SCALE*pt.first),convCoordY(IMAGE_SCALE*pt.second));
 		glEnd();
 	}
+
 	//Draw Voronoi Diagrams
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
@@ -130,7 +136,7 @@ int main(int argc, char** argv)
 	Voronoi diagram(inputImage);
 	gDiagram = &diagram;
 	diagram.createDiagram(similarity);
-	diagram.printVoronoi();
+	//diagram.printVoronoi();
 
 	//Create B-Splines on the end points of Voronoi edges.
 
