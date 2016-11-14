@@ -19,7 +19,7 @@ void Voronoi::createDiagram(Graph& graph)
 		for(int j = 0; j < h; j ++) v1.push_back(vector<pair<bool,int>>(8,make_pair(false,0)));
 		polygons.push_back(v1);
 		voronoiPts.push_back(v2);
-
+		resultPts.push_back(v2);
 	}
 	createRegions(graph);
 	removeUseless();
@@ -27,6 +27,7 @@ void Voronoi::createDiagram(Graph& graph)
 
 int Voronoi::valence(int x,int y)
 {
+	cout<<"hehe";
 	// if(x < 0 || x >= this->image->getWidth()) return -1;
 	// if(y < 0 || y >= this->image->getHeight()) return -1;
 
@@ -38,14 +39,14 @@ int Voronoi::valence(int x,int y)
 void Voronoi::printVoronoi()
 {
 
-	cout<<"\nImage height = "<<height<<"\tImage width = "<<width << endl;
-	for(int i=0; i <width; i++)
-	{
-		for(int j=0; j< height; j++)
-		{
-			cout<<"voronoi["<<i<<"]["<<j<<"] = "<<voronoiPts[i][j]<<"\n";
-		}
-	}
+	// cout<<"\nImage height = "<<height<<"\tImage width = "<<width << endl;
+	// for(int i=0; i <width; i++)
+	// {
+	// 	for(int j=0; j< height; j++)
+	// 	{
+	// 		cout<<"voronoi["<<i<<"]["<<j<<"] = "<<voronoiPts[i][j]<<"\n";
+	// 	}
+	// }
 
 }
 
@@ -157,7 +158,7 @@ void Voronoi::createRegions(Graph& graph)
 	}
 
 	// collapseValence2();			// removing useless points in the voronoi
-	// convex_hull();				// get all the convex hull points
+	convex_hull();				// get all the convex hull points
 	// fixBoundaries()				//fix boundaries
 }
 
@@ -169,7 +170,50 @@ void Voronoi::convex_hull()
 	{
 		for(int y = 0; y < height; y++)
 		{
-			voronoiPts[i][j]
+
+			cout<<"\nvoronoi["<<x<<"]["<<y<<"] = "<<voronoiPts[x][y]<<"\n";
+
+			vector<pair<float, float>> hull;
+
+			int left = 0; 					//leftmost point 
+			for(int z = 0; z < 8; z++)
+			{
+				if(voronoiPts[x][y][z].first < voronoiPts[x][y][left].first)
+				{
+					left = z;
+				}
+			}
+
+			int p =left, q;
+			do{
+				hull.push_back(make_pair(voronoiPts[x][y][p].first, voronoiPts[x][y][p].second));
+
+				q = (p+1)%8;
+
+				for(int i = 0; i < 8; i++)
+				{
+					// check orientation of each 
+					int orient = 0;
+					float val = (voronoiPts[x][y][i].second - voronoiPts[x][y][p].second)*(voronoiPts[x][y][q].first - voronoiPts[x][y][i].first) - (voronoiPts[x][y][i].first - voronoiPts[x][y][p].first)*(voronoiPts[x][y][q].second - voronoiPts[x][y][i].second);
+					if (val == 0.0) 
+						orient = 0;						  // colinear
+					else if(val > 0.0)
+						orient = 1;						  // cloclwise
+					else
+						orient = 2;						  // counterclockwise
+
+					if(orient == 2)
+					{
+						q = i;
+					}
+
+				}
+				p = q;
+
+			}while(p!=left);
+
+			for (int i = 0; i < hull.size(); i++)
+        		cout << "(" << hull[i].first << ", "<< hull[i].second << ")\n";
 
 		}
 	}

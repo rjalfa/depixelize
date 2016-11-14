@@ -72,6 +72,8 @@ void display()
 	glutSwapBuffers();
 }
 
+
+
 void idleFunction()
 {
 	glutSetWindow(majorwindow);
