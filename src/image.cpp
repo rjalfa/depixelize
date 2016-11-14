@@ -75,5 +75,12 @@ _pixel* Image::operator()(unsigned int i, unsigned int j)
 
 bool _pixel::isSimilar(_pixel& a)
 {
-    return (abs((unsigned int)(get<0>(this->colors)-get<0>(a.colors))==0))&&(abs((unsigned int)(get<1>(this->colors)-get<1>(a.colors))==0))&&(abs((unsigned int)(get<2>(this->colors)-get<2>(a.colors))==0));
+    double y1 = 0.299*get<0>(this->colors) + 0.587*get<1>(this->colors) + 0.114*get<2>(this->colors);
+    double u1 = -0.147*get<0>(this->colors) - 0.289*get<1>(this->colors) + 0.436*get<2>(this->colors);
+    double v1 = 0.615*get<0>(this->colors) - 0.515*get<1>(this->colors) - 0.100*get<2>(this->colors);
+    double y2 = 0.299*get<0>(a.colors) + 0.587*get<1>(a.colors) + 0.114*get<2>(a.colors);
+    double u2 = -0.147*get<0>(a.colors) - 0.289*get<1>(a.colors) + 0.436*get<2>(a.colors);
+    double v2 = 0.615*get<0>(a.colors) - 0.515*get<1>(a.colors) - 0.100*get<2>(a.colors);
+    return (abs(y1-y2) < 48.0/255.0 && abs(u1-u2) < 7.0/255.0 && abs(v1-v2) < 6.0/255.0);
+//    return (abs((unsigned int)(get<0>(this->colors)-get<0>(a.colors))==0))&&(abs((unsigned int)(get<1>(this->colors)-get<1>(a.colors))==0))&&(abs((unsigned int)(get<2>(this->colors)-get<2>(a.colors))==0));
 }
