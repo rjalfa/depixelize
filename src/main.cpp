@@ -6,7 +6,7 @@ using namespace std;
 
 Image* gImage = nullptr;
 Graph* gSimilarity = nullptr;
-
+Voronoi* gDiagram = nullptr;
 int majorwindow;
 void printGraph(Graph& g)
 {
@@ -70,10 +70,30 @@ void display()
 			glEnd();
 		}
 	}
+	//Draws Voronoi Points 
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
-			
+		glColor3f(0.0f,0.0f,0.0f);
+		glPointSize(3);
+		glBegin(GL_POINTS);
+		for(pair<float,float> pt : (*gDiagram)(x,y)) glVertex2f(convCoordX(IMAGE_SCALE*pt.first),convCoordY(IMAGE_SCALE*pt.second));
+		glEnd();
+	}
+	//Draw Voronoi Diagrams
+	for(int x = 0 ; x < gImage->getWidth(); x++)
+	for(int y = 0 ; y < gImage->getHeight(); y++)
+	{
+		auto color = (*gImage)(x,y)->getColor();
+		float r = get<0>(color)/255.0;
+		float g = get<1>(color)/255.0;
+		float b = get<2>(color)/255.0;
+		glColor3f(r, g, b);
+		glBegin(GL_POLYGON);
+		auto hull = gDiagram->getHull(x,y);
+		for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
+		if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
+		glEnd();
 	}
 	glutSwapBuffers();
 }
@@ -108,8 +128,8 @@ int main(int argc, char** argv)
 
 	//Create Voronoi diagram for reshaping the pixels
 	Voronoi diagram(inputImage);
+	gDiagram = &diagram;
 	diagram.createDiagram(similarity);
-	voronoiPts = diagram.getVoronoi();
 	diagram.printVoronoi();
 
 	//Create B-Splines on the end points of Voronoi edges.

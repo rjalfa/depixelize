@@ -19,6 +19,7 @@ void Voronoi::createDiagram(Graph& graph)
 		for(int j = 0; j < h; j ++) v1.push_back(vector<pair<bool,int>>(8,make_pair(false,0)));
 		polygons.push_back(v1);
 		voronoiPts.push_back(v2);
+		hullPts.push_back(v2);
 		resultPts.push_back(v2);
 	}
 	createRegions(graph);
@@ -171,16 +172,26 @@ void Voronoi::convex_hull()
 
 			cout<<"\nvoronoi["<<x<<"]["<<y<<"] = "<<voronoiPts[x][y]<<"\n";
 
-			vector<pair<float, float>> hull;
 			vector<Point> Pts;
 			for(pair<float,float> p : voronoiPts[x][y]) Pts.push_back(Point(p.first,p.second));
 			vector<Point> hullPts = ::convex_hull(Pts);
-			for(Point p : hullPts) hull.push_back(make_pair(p.x,p.y));
-			for (int i = 0; i < hull.size(); i++)
-        		cout << "(" << hull[i].first << ", "<< hull[i].second << ")\n";
+			for(Point p : hullPts) (this->hullPts[x][y]).push_back(make_pair(p.x,p.y));
+			//copy(hull.begin(), hull.end(),(this->hullPts[x][y]).begin());
+			//for (int i = 0; i < hull.size(); i++)
+        	//	cout << "(" << hull[i].first << ", "<< hull[i].second << ")\n";
 		}
 	}
 
+}
+
+vector<pair<float,float>> Voronoi::operator()(int i,int j)
+{
+	return voronoiPts[i][j];
+}
+
+vector<pair<float,float>> Voronoi::getHull(int i,int j)
+{
+	return hullPts[i][j];
 }
 
 void Voronoi::removeUseless()
