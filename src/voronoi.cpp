@@ -54,16 +54,15 @@ void Voronoi::printVoronoi()
 void Voronoi::collapseValence2()
 {
 
-	for(int i=0; i <width; i++)
-	{
-		for(int j=0; j< height; j++)
-		{
-			if(valence(i,j) != 2)
-			{
-
-			}
-		}
-	}
+	// for(int i=0; i <width; i++)
+	// {
+	// 	for(int j=0; j< height; j++)
+	// 	{
+	// 		if(valence(i,j) != 2)
+	// 		{
+	//		}
+	//	}
+	//}
 }
 
 
