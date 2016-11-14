@@ -73,28 +73,31 @@ bool insideBounds(int x, int y, int row_st, int row_end, int col_st, int col_end
 void Graph::curves_heuristic(int x, int y)
 {
 	//Directions are (x,y) BOTTOM_RIGHT, and Right(x,y) BOTTOM_LEFT
-	int featureA = 1;
-	int featureB = 1;
+	int featureA = 0;
+	int featureB = 0;
 
 	int p = x, q = y;
 	int dir = BOTTOM_RIGHT;
-	while(valence(p,q) == 2)
+	while(true)
 	{
 		featureA++;
+		if(valence(p,q) != 2) break;
 		int i;
+		
 		for(i = dir+1; edges[p][q][i] == false; i = (i+1)%8);
 		if((i+dir)==7) break;
 		dir = i;
 		p = p + direction[dir][0];
 		q = q + direction[dir][1];
 	}
-
 	p = x+direction[BOTTOM_RIGHT][0];
 	q = y+direction[BOTTOM_RIGHT][1];
-	dir = TOP_LEFT;
-	while(valence(p,q) == 2)
+	dir = TOP_LEFT;	
+	while(true)
 	{
 		featureA++;
+		if(valence(p,q) != 2) break;
+
 		int i;
 		for(i = dir+1; edges[p][q][i] == false; i = (i+1)%8);
 		if((i+dir)==7) break;
@@ -105,10 +108,12 @@ void Graph::curves_heuristic(int x, int y)
 
 	p = x+direction[RIGHT][0];
 	q = y+direction[RIGHT][1];
-	dir = BOTTOM_LEFT;
-	while(valence(p,q) == 2)
+	dir = BOTTOM_LEFT;	
+	while(true)
 	{
 		featureB++;
+		if(valence(p,q) != 2) break;
+
 		int i;
 		for(i = dir+1; edges[p][q][i] == false; i = (i+1)%8);
 		if((i+dir)==7) break;
@@ -120,9 +125,12 @@ void Graph::curves_heuristic(int x, int y)
 	p = x+direction[RIGHT][0] + direction[BOTTOM_LEFT][0];
 	q = y+direction[RIGHT][1] + direction[BOTTOM_LEFT][1];
 	dir = TOP_RIGHT;
-	while(valence(p,q) == 2)
+	
+	while(true)
 	{
 		featureB++;
+		if(valence(p,q) != 2) break;
+
 		int i;
 		for(i = dir+1; edges[p][q][i] == false; i = (i+1)%8);
 		if((i+dir)==7) break;
@@ -130,10 +138,10 @@ void Graph::curves_heuristic(int x, int y)
 		p = p + direction[dir][0];
 		q = q + direction[dir][1];
 	}
-
+	
 	if(featureA < featureB) {
-		weights[x+direction[RIGHT][0]][y+direction[RIGHT][1]][BOTTOM_LEFT] += 10*(featureB - featureA);
-		weights[x+direction[BOTTOM][0]][y+direction[BOTTOM][1]][TOP_RIGHT] += 10*(featureB - featureA);
+		weights[x+direction[RIGHT][0]][y+direction[RIGHT][1]][BOTTOM_LEFT] += (featureB - featureA);
+		weights[x+direction[BOTTOM][0]][y+direction[BOTTOM][1]][TOP_RIGHT] += (featureB - featureA);
 	}
 	else 
 	{
@@ -147,7 +155,7 @@ void Graph::islands_heuristic(int x,int y)
 	for(int i = 0; i < 8; i++) if(edges[x][y][i] == true) 
 	{
 		weights[x][y][i] = 5 * ((valence(x,y) == 1) + (valence(x+direction[BOTTOM_RIGHT][0],y+direction[BOTTOM_RIGHT][1]) == 1));
-		weights[x+direction[i][0]][y+direction[i][1	]][7-i] = 5 * ((valence(x,y) == 1) + (valence(x+direction[BOTTOM_RIGHT][0],y+direction[BOTTOM_RIGHT][1]) == 1));
+		weights[x+direction[i][0]][y+direction[i][1]][7-i] = 5 * ((valence(x,y) == 1) + (valence(x+direction[BOTTOM_RIGHT][0],y+direction[BOTTOM_RIGHT][1]) == 1));
 	}
 }
 
@@ -194,7 +202,7 @@ void Graph::sparse_pixels_heuristic(int x, int y)
 			if(labels[3+p+direction[i][0]-x][3+q+direction[i][1]-y] != 0) continue;
 			if(edges[p][q][i] == false) continue;
 			st.push(make_pair(p+direction[i][0],q+direction[i][1]));
-			labels[3+p+direction[i][0]-x][3+q+direction[i][1]-y] = 1;
+			labels[3+p+direction[i][0]-x][3+q+direction[i][1]-y] = 2;
 		}
 	}
 
