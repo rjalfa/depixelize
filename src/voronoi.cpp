@@ -178,47 +178,51 @@ void Voronoi::createRegions(Graph& graph)
 			//TOPLEFT
 			if(graph.edge(x,y,TOP_LEFT))
 			{
-				voronoiPts[x][y].push_back(make_pair(xcenter-0.75,ycenter-0.25));
+				cout << "TOPLEFTCORNER @ "<<x <<":"<<y<<endl;
 				voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter-0.75));
+				voronoiPts[x][y].push_back(make_pair(xcenter-0.75,ycenter-0.25));
 			}
 			else if(graph.edge(x+direction[TOP][0],y+direction[TOP][1],BOTTOM_LEFT)) voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter-0.25)); 
 			else voronoiPts[x][y].push_back(make_pair(xcenter-0.5,ycenter-0.5));
 			
 			//TOP
-			voronoiPts[x][y].push_back(make_pair(xcenter,ycenter-0.5));
+			voronoiPts[x][y].push_back(make_pair(xcenter-0.5,ycenter));
 
 			//TOPRIGHT
 			if(graph.edge(x,y,TOP_RIGHT))
 			{
-				voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter-0.75));
-				voronoiPts[x][y].push_back(make_pair(xcenter+0.75,ycenter-0.25));
+				cout << "TOPRIGHTTCORNER @ "<<x <<":"<<y<<endl;
+				voronoiPts[x][y].push_back(make_pair(xcenter-0.75,ycenter+0.25));
+				voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter+0.75));
 			}
-			else if(graph.edge(x+direction[TOP][0],y+direction[TOP][1],BOTTOM_RIGHT)) voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter-0.25)); 
-			else voronoiPts[x][y].push_back(make_pair(xcenter+0.5,ycenter-0.5));
+			else if(graph.edge(x+direction[TOP][0],y+direction[TOP][1],BOTTOM_RIGHT)) voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter+0.25)); 
+			else voronoiPts[x][y].push_back(make_pair(xcenter-0.5,ycenter+0.5));
 			
 			//RIGHT
-			voronoiPts[x][y].push_back(make_pair(xcenter+0.5,ycenter));
+			voronoiPts[x][y].push_back(make_pair(xcenter,ycenter+0.5));
 
 			//BOTTOMRIGHT
 			if(graph.edge(x,y,BOTTOM_RIGHT))
 			{
-				voronoiPts[x][y].push_back(make_pair(xcenter+0.75,ycenter+0.25));
+				cout << "BOTTOMRIGHTCORNER @ "<<x <<":"<<y<<endl;
 				voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter+0.75));
+				voronoiPts[x][y].push_back(make_pair(xcenter+0.75,ycenter+0.25));
 			}
 			else if(graph.edge(x+direction[BOTTOM][0],y+direction[BOTTOM][1],TOP_RIGHT)) voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter+0.25)); 
 			else voronoiPts[x][y].push_back(make_pair(xcenter+0.5,ycenter+0.5));
 			
 			//BOTTOM
-			voronoiPts[x][y].push_back(make_pair(xcenter,ycenter+0.5));
+			voronoiPts[x][y].push_back(make_pair(xcenter+0.5,ycenter));
 
 			//BOTTOMLEFT
 			if(graph.edge(x,y,BOTTOM_LEFT))
 			{
-				voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter+0.75));
-				voronoiPts[x][y].push_back(make_pair(xcenter-0.75,ycenter+0.25));
+				cout << "BOTTOMLEFTCORNER @ "<<x <<":"<<y<<endl;
+				voronoiPts[x][y].push_back(make_pair(xcenter+0.75,ycenter-0.25));
+				voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter-0.75));
 			}
-			else if(graph.edge(x+direction[BOTTOM][0],y+direction[BOTTOM][1],TOP_LEFT)) voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter+0.25)); 
-			else voronoiPts[x][y].push_back(make_pair(xcenter-0.5,ycenter+0.5));
+			else if(graph.edge(x+direction[BOTTOM][0],y+direction[BOTTOM][1],TOP_LEFT)) voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter-0.25)); 
+			else voronoiPts[x][y].push_back(make_pair(xcenter+0.5,ycenter-0.5));
 			
 			//LEFT
 			voronoiPts[x][y].push_back(make_pair(xcenter-0.5,ycenter));

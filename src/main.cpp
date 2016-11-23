@@ -54,7 +54,8 @@ void display()
 	glBegin(GL_QUADS);
 	
 	//Print Image 
-	/*for(int x = 0 ; x < gImage->getWidth(); x++)
+	/*
+	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
 		auto color = (*gImage)(x,y)->getColor();
@@ -67,7 +68,8 @@ void display()
 		glVertex2f(convCoordX(IMAGE_SCALE*(x+1)), convCoordY(IMAGE_SCALE*(y+1)));
 		glVertex2f(convCoordX(IMAGE_SCALE*x), convCoordY(IMAGE_SCALE*(y+1)));
 	}
-	glEnd();*/
+	glEnd();
+	*/
 
 	//Draw Voronoi Diagrams
 	for(int x = 0 ; x < gImage->getWidth(); x++)
@@ -83,6 +85,12 @@ void display()
 		for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
 		if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
 		glEnd();
+		
+		glColor3f(0.0f, 0.0f, 0.0f);
+		glBegin(GL_LINE_LOOP);
+		for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
+		if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
+		glEnd();
 	}
 	
 	// Print Similarity
@@ -92,7 +100,7 @@ void display()
 		for(int k = 0 ; k < 8; k++) if(gSimilarity->edge(x,y,k))
 		{
 			glBegin(GL_LINES);
-			glColor3f(0.0,0.0,1.0);
+			glColor3f(0.5,0.5,1.0);
 			glVertex2f(convCoordX(IMAGE_SCALE*(x+0.5)), convCoordY(IMAGE_SCALE*(y+0.5)));
 			glVertex2f(convCoordX(IMAGE_SCALE*(x+0.5+direction[k][0])), convCoordY(IMAGE_SCALE*(y+0.5+direction[k][1])));
 			glEnd();
@@ -109,7 +117,6 @@ void display()
 		for(pair<float,float> pt : (*gDiagram)(x,y)) glVertex2f(convCoordX(IMAGE_SCALE*pt.first),convCoordY(IMAGE_SCALE*pt.second));
 		glEnd();
 	}
-
 	glutSwapBuffers();
 }
 
