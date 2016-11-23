@@ -3,6 +3,7 @@
 #include "graph.h"
 #include "voronoi.h"
 using namespace std;
+float IMAGE_SCALE = 1.0f;
 
 Image* gImage = nullptr;
 Graph* gSimilarity = nullptr;
@@ -28,25 +29,32 @@ void printGraph(Graph& g)
 	}
 }
 
+void keyboard(unsigned char key, int x, int y)
+{
+	switch(key)
+  	{
+		case 27:exit(0);break; 
+  	}
+}
+
 float convCoordX(float x)
 {
-	return (2*x)/(4*(gImage->getWidth())) - 1;
+	return (2*x)/(IMAGE_SCALE*(gImage->getWidth())) - 1;
 }
 
 float convCoordY(float y)
 {
-	return (2*y)/(4*(gImage->getHeight())) - 1;
+	return (2*y)/(IMAGE_SCALE*(gImage->getHeight())) - 1;
 }
 
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(1.0,1.0,1.0,0.0);
-	float IMAGE_SCALE = 4.0f;
 	glBegin(GL_QUADS);
 	
 	//Print Image 
-	for(int x = 0 ; x < gImage->getWidth(); x++)
+	/*for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
 		auto color = (*gImage)(x,y)->getColor();
@@ -59,8 +67,24 @@ void display()
 		glVertex2f(convCoordX(IMAGE_SCALE*(x+1)), convCoordY(IMAGE_SCALE*(y+1)));
 		glVertex2f(convCoordX(IMAGE_SCALE*x), convCoordY(IMAGE_SCALE*(y+1)));
 	}
-	glEnd();
+	glEnd();*/
 
+	//Draw Voronoi Diagrams
+	for(int x = 0 ; x < gImage->getWidth(); x++)
+	for(int y = 0 ; y < gImage->getHeight(); y++)
+	{
+		auto color = (*gImage)(x,y)->getColor();
+		float r = get<0>(color)/255.0;
+		float g = get<1>(color)/255.0;
+		float b = get<2>(color)/255.0;
+		glColor3f(r, g, b);
+		glBegin(GL_POLYGON);
+		auto hull = (*gDiagram)(x,y);
+		for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
+		if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
+		glEnd();
+	}
+	
 	// Print Similarity
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
@@ -79,28 +103,13 @@ void display()
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
-		glColor3f(0.0f,0.0f,0.0f);
+		glColor3f(0.0f,0.0f,1.0f);
 		glPointSize(3);
 		glBegin(GL_POINTS);
 		for(pair<float,float> pt : (*gDiagram)(x,y)) glVertex2f(convCoordX(IMAGE_SCALE*pt.first),convCoordY(IMAGE_SCALE*pt.second));
 		glEnd();
 	}
 
-	//Draw Voronoi Diagrams
-	for(int x = 0 ; x < gImage->getWidth(); x++)
-	for(int y = 0 ; y < gImage->getHeight(); y++)
-	{
-		auto color = (*gImage)(x,y)->getColor();
-		float r = get<0>(color)/255.0;
-		float g = get<1>(color)/255.0;
-		float b = get<2>(color)/255.0;
-		glColor3f(r, g, b);
-		glBegin(GL_POLYGON);
-		auto hull = gDiagram->getHull(x,y);
-		for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
-		if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
-		glEnd();
-	}
 	glutSwapBuffers();
 }
 
@@ -136,7 +145,7 @@ int main(int argc, char** argv)
 	Voronoi diagram(inputImage);
 	gDiagram = &diagram;
 	diagram.createDiagram(similarity);
-	//diagram.printVoronoi();
+	diagram.printVoronoi();
 
 	//Create B-Splines on the end points of Voronoi edges.
 
@@ -148,6 +157,7 @@ int main(int argc, char** argv)
 	glutInitWindowPosition(100,100);
 	glutInitWindowSize(50*inputImage.getWidth(),50*inputImage.getHeight());
 	majorwindow = glutCreateWindow("Depixelize!");
+	glutKeyboardFunc(keyboard);
 
 	GLenum glew_status = glewInit();
 	if (glew_status != GLEW_OK) {

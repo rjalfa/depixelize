@@ -64,6 +64,9 @@ Image::Image(string file)
         row = (row + 1) % width;
         if(row == 0) {off += 2;col = (col + 1)%height;}
     }
+    //Fixing order since scan order is reversed for rows in BMP
+    _pixel t[width][height];
+    //delete[] t;
     assert(off== data.GetPixels().size());
 }
 

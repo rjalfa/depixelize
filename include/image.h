@@ -29,7 +29,8 @@ class _pixel
 	tuple<unsigned int,unsigned int,unsigned int> colors;
 	pair<unsigned int,unsigned int> position;
 	public:
-		_pixel(Image* const image_ref, int R, int G, int B, int x, int y);
+        _pixel(Image* const image_ref, int R, int G, int B, int x, int y);
+        _pixel() : image_ref(nullptr) {};
         unsigned int getX() {return this->position.first;}
         unsigned int getY() {return this->position.second;}
         tuple<unsigned int,unsigned int,unsigned int> getColor() {return this->colors;};    

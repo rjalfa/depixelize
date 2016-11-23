@@ -23,7 +23,7 @@ void Voronoi::createDiagram(Graph& graph)
 		resultPts.push_back(v2);
 	}
 	createRegions(graph);
-	removeUseless();
+	//	removeUseless();
 }
 
 int Voronoi::valence(int x,int y)
@@ -40,14 +40,16 @@ int Voronoi::valence(int x,int y)
 void Voronoi::printVoronoi()
 {
 
-	// cout<<"\nImage height = "<<height<<"\tImage width = "<<width << endl;
-	// for(int i=0; i <width; i++)
-	// {
-	// 	for(int j=0; j< height; j++)
-	// 	{
-	// 		cout<<"voronoi["<<i<<"]["<<j<<"] = "<<voronoiPts[i][j]<<"\n";
-	// 	}
-	// }
+	cout<<"\nImage height = "<<height<<"\tImage width = "<<width << endl;
+	for(int i=0; i <width; i++)
+	{
+		for(int j=0; j< height; j++)
+		{
+			cout<<"voronoi["<<i<<"]["<<j<<"] = "<<voronoiPts[i][j] << ",Pixel:";
+			(*imageRef)(i,j)->print(cout);
+			cout<<"\n";
+		}
+	}
 
 }
 
@@ -65,7 +67,7 @@ void Voronoi::collapseValence2()
 	//}
 }
 
-
+/*
 void Voronoi::createRegions(Graph& graph)
 {
 	int x, y, z;
@@ -108,7 +110,7 @@ void Voronoi::createRegions(Graph& graph)
 				else voronoiPts[x][y].push_back(make_pair(xcenter-0.5, ycenter-0.5));
 			}
 			// IMPORTANT: IF NO TOP LEFT IS THERE, ADD POINT X,Y TO THE VORONOIPTS(similarly for others)
-
+			
 			// DOWNLEFT
 			if(graph.edge(x,y,BOTTOM_LEFT))
 			{
@@ -160,7 +162,69 @@ void Voronoi::createRegions(Graph& graph)
 	convex_hull();					// get all the convex hull points
 	// fixBoundaries()				//fix boundaries
 }
+*/
 
+void Voronoi::createRegions(Graph& graph)
+{
+	int x, y, z;
+	float xcenter, ycenter;
+	for(x = 0; x< width; x++)
+	{
+		for(y = 0; y < height; y++)
+		{
+
+			xcenter = x + 0.5;
+			ycenter = y + 0.5;
+			//TOPLEFT
+			if(graph.edge(x,y,TOP_LEFT))
+			{
+				voronoiPts[x][y].push_back(make_pair(xcenter-0.75,ycenter-0.25));
+				voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter-0.75));
+			}
+			else if(graph.edge(x+direction[TOP][0],y+direction[TOP][1],BOTTOM_LEFT)) voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter-0.25)); 
+			else voronoiPts[x][y].push_back(make_pair(xcenter-0.5,ycenter-0.5));
+			
+			//TOP
+			voronoiPts[x][y].push_back(make_pair(xcenter,ycenter-0.5));
+
+			//TOPRIGHT
+			if(graph.edge(x,y,TOP_RIGHT))
+			{
+				voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter-0.75));
+				voronoiPts[x][y].push_back(make_pair(xcenter+0.75,ycenter-0.25));
+			}
+			else if(graph.edge(x+direction[TOP][0],y+direction[TOP][1],BOTTOM_RIGHT)) voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter-0.25)); 
+			else voronoiPts[x][y].push_back(make_pair(xcenter+0.5,ycenter-0.5));
+			
+			//RIGHT
+			voronoiPts[x][y].push_back(make_pair(xcenter+0.5,ycenter));
+
+			//BOTTOMRIGHT
+			if(graph.edge(x,y,BOTTOM_RIGHT))
+			{
+				voronoiPts[x][y].push_back(make_pair(xcenter+0.75,ycenter+0.25));
+				voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter+0.75));
+			}
+			else if(graph.edge(x+direction[BOTTOM][0],y+direction[BOTTOM][1],TOP_RIGHT)) voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter+0.25)); 
+			else voronoiPts[x][y].push_back(make_pair(xcenter+0.5,ycenter+0.5));
+			
+			//BOTTOM
+			voronoiPts[x][y].push_back(make_pair(xcenter,ycenter+0.5));
+
+			//BOTTOMLEFT
+			if(graph.edge(x,y,BOTTOM_LEFT))
+			{
+				voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter+0.75));
+				voronoiPts[x][y].push_back(make_pair(xcenter-0.75,ycenter+0.25));
+			}
+			else if(graph.edge(x+direction[BOTTOM][0],y+direction[BOTTOM][1],TOP_LEFT)) voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter+0.25)); 
+			else voronoiPts[x][y].push_back(make_pair(xcenter-0.5,ycenter+0.5));
+			
+			//LEFT
+			voronoiPts[x][y].push_back(make_pair(xcenter-0.5,ycenter));
+		}
+	}
+}
 void Voronoi::convex_hull()
 {
 	for(int x = 0; x< width; x++)
@@ -173,8 +237,8 @@ void Voronoi::convex_hull()
 			vector<Point> Pts;
 			for(pair<float,float> p : voronoiPts[x][y]) Pts.push_back(Point(p.first,p.second));
 			vector<Point> hullPts = ::convex_hull(Pts);
-			for(Point p : hullPts) (this->hullPts[x][y]).push_back(make_pair(p.x,p.y));
-			//copy(hull.begin(), hull.end(),(this->hullPts[x][y]).begin());
+			//for(Point p : hullPts) (this->hullPts[x][y]).push_back(make_pair(p.x,p.y));
+			copy(voronoiPts[x][y].begin(), voronoiPts[x][y].end(),(this->hullPts[x][y]).begin());
 			//for (int i = 0; i < hull.size(); i++)
         	//	cout << "(" << hull[i].first << ", "<< hull[i].second << ")\n";
 		}
