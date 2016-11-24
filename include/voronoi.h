@@ -12,6 +12,8 @@ class Voronoi
 	vector<vector<vector<pair<float, float>>>> voronoiPts;
 	vector<vector<vector<pair<float, float>>>> hullPts;
 	vector<vector<vector<pair<float, float>>>> resultPts;
+	map<pair<float,float>,int> valency;
+	bool onBoundary(pair<float,float> p);
 	public: 
 		Voronoi(Image& inputImage) { imageRef = &inputImage;}
 		void createDiagram(Graph& graph);
@@ -19,7 +21,6 @@ class Voronoi
 		void removeUseless();
 		void fixBoundaries();
 		void printVoronoi();
-		int valence(int x, int y);
 		void collapseValence2();
 		int collapseValence2nce(int x, int y);
 		void convex_hull();
