@@ -19,8 +19,6 @@ void Voronoi::createDiagram(Graph& graph)
 		for(int j = 0; j < h; j ++) v1.push_back(vector<pair<bool,int>>(8,make_pair(false,0)));
 		polygons.push_back(v1);
 		voronoiPts.push_back(v2);
-		hullPts.push_back(v2);
-		resultPts.push_back(v2);
 	}
 	createRegions(graph);
 	collapseValence2();
@@ -141,43 +139,8 @@ void Voronoi::createRegions(Graph& graph)
 		}
 	}
 }
-void Voronoi::convex_hull()
-{
-	for(int x = 0; x< width; x++)
-	{
-		for(int y = 0; y < height; y++)
-		{
-
-			//cout<<"\nvoronoi["<<x<<"]["<<y<<"] = "<<voronoiPts[x][y]<<"\n";
-
-			vector<Point> Pts;
-			for(pair<float,float> p : voronoiPts[x][y]) Pts.push_back(Point(p.first,p.second));
-			vector<Point> hullPts = ::convex_hull(Pts);
-			//for(Point p : hullPts) (this->hullPts[x][y]).push_back(make_pair(p.x,p.y));
-			copy(voronoiPts[x][y].begin(), voronoiPts[x][y].end(),(this->hullPts[x][y]).begin());
-			//for (int i = 0; i < hull.size(); i++)
-        	//	cout << "(" << hull[i].first << ", "<< hull[i].second << ")\n";
-		}
-	}
-
-}
 
 vector<pair<float,float>> Voronoi::operator()(int i,int j)
 {
 	return voronoiPts[i][j];
-}
-
-vector<pair<float,float>> Voronoi::getHull(int i,int j)
-{
-	return hullPts[i][j];
-}
-
-void Voronoi::removeUseless()
-{
-	
-}
-
-void Voronoi::fixBoundaries()
-{
-	//Fix boundaries and complete the polygons to make all closed.
 }
