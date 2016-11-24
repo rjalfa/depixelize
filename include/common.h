@@ -11,6 +11,7 @@
 #include <iostream>
 #include <algorithm>
 #include <stack>
+#include <map>
 #include <cassert>
 #include <GL/glew.h>
 #include <GL/glui.h>

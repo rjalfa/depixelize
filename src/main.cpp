@@ -47,6 +47,17 @@ float convCoordY(float y)
 	return (2*y)/(IMAGE_SCALE*(gImage->getHeight())) - 1;
 }
 
+void drawPolygon(vector<pair<float,float> > hull, float r, float g, float b)
+{
+	glColor3f(r,g,b);
+	//Need to tessellate for handling concaves
+	glBegin(GL_POLYGON);
+	for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
+	if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
+	glEnd();
+
+}
+
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -79,12 +90,9 @@ void display()
 		float r = get<0>(color)/255.0;
 		float g = get<1>(color)/255.0;
 		float b = get<2>(color)/255.0;
-		glColor3f(r, g, b);
-		glBegin(GL_POLYGON);
 		auto hull = (*gDiagram)(x,y);
-		for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
-		if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
-		glEnd();
+		//Fill Polygon
+		drawPolygon(hull, r,g,b);
 		
 		glColor3f(0.0f, 0.0f, 0.0f);
 		glBegin(GL_LINE_LOOP);
@@ -92,7 +100,7 @@ void display()
 		if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
 		glEnd();
 	}
-	
+	/*
 	// Print Similarity
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
@@ -117,6 +125,7 @@ void display()
 		for(pair<float,float> pt : (*gDiagram)(x,y)) glVertex2f(convCoordX(IMAGE_SCALE*pt.first),convCoordY(IMAGE_SCALE*pt.second));
 		glEnd();
 	}
+	*/
 	glutSwapBuffers();
 }
 

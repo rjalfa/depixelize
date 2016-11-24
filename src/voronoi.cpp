@@ -1,6 +1,8 @@
 #include "voronoi.h"
 int height, width;
 
+map<pair<float,float>,int> valency;
+
 void Voronoi::createDiagram(Graph& graph)
 {
 	int h = imageRef->getHeight();
@@ -23,6 +25,7 @@ void Voronoi::createDiagram(Graph& graph)
 		resultPts.push_back(v2);
 	}
 	createRegions(graph);
+	collapseValence2();
 	//	removeUseless();
 }
 
@@ -56,15 +59,34 @@ void Voronoi::printVoronoi()
 void Voronoi::collapseValence2()
 {
 
-	// for(int i=0; i <width; i++)
-	// {
-	// 	for(int j=0; j< height; j++)
-	// 	{
-	// 		if(valence(i,j) != 2)
-	// 		{
-	//		}
-	//	}
-	//}
+	for(int x=0; x <width; x++)
+	{
+		for(int y=0; y< height; y++)
+		{
+			for(int i = 0 ; i < voronoiPts[x][y].size(); i++) 
+			{
+				int l = i;
+				int r = (i+1)%(voronoiPts[x][y].size());
+				if(valency.find(voronoiPts[x][y][l]) != valency.end()) {valency[voronoiPts[x][y][l]] += 1;}
+				else valency[voronoiPts[x][y][l]] = 1;
+				if(valency.find(voronoiPts[x][y][r]) != valency.end()) {valency[voronoiPts[x][y][r]] += 1;}
+				else valency[voronoiPts[x][y][r]] = 1;
+			}  
+		}
+	}
+	for(int x = 0; x < width; x++)
+	{
+		for(int y=0; y< height; y++)
+		{
+			vector<pair<float,float> > temp;
+			for(int i = 0 ; i < voronoiPts[x][y].size(); i++) 
+			{
+				if(valency[voronoiPts[x][y][i]] != 4) temp.push_back(voronoiPts[x][y][i]);  
+			}
+			voronoiPts[x][y].clear();
+			voronoiPts[x][y] = vector<pair<float,float> >(temp);
+		}	
+	}
 }
 
 /*
@@ -178,7 +200,6 @@ void Voronoi::createRegions(Graph& graph)
 			//TOPLEFT
 			if(graph.edge(x,y,TOP_LEFT))
 			{
-				cout << "TOPLEFTCORNER @ "<<x <<":"<<y<<endl;
 				voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter-0.75));
 				voronoiPts[x][y].push_back(make_pair(xcenter-0.75,ycenter-0.25));
 			}
@@ -191,7 +212,6 @@ void Voronoi::createRegions(Graph& graph)
 			//TOPRIGHT
 			if(graph.edge(x,y,TOP_RIGHT))
 			{
-				cout << "TOPRIGHTTCORNER @ "<<x <<":"<<y<<endl;
 				voronoiPts[x][y].push_back(make_pair(xcenter-0.75,ycenter+0.25));
 				voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter+0.75));
 			}
@@ -204,7 +224,6 @@ void Voronoi::createRegions(Graph& graph)
 			//BOTTOMRIGHT
 			if(graph.edge(x,y,BOTTOM_RIGHT))
 			{
-				cout << "BOTTOMRIGHTCORNER @ "<<x <<":"<<y<<endl;
 				voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter+0.75));
 				voronoiPts[x][y].push_back(make_pair(xcenter+0.75,ycenter+0.25));
 			}
@@ -217,7 +236,6 @@ void Voronoi::createRegions(Graph& graph)
 			//BOTTOMLEFT
 			if(graph.edge(x,y,BOTTOM_LEFT))
 			{
-				cout << "BOTTOMLEFTCORNER @ "<<x <<":"<<y<<endl;
 				voronoiPts[x][y].push_back(make_pair(xcenter+0.75,ycenter-0.25));
 				voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter-0.75));
 			}
@@ -225,7 +243,7 @@ void Voronoi::createRegions(Graph& graph)
 			else voronoiPts[x][y].push_back(make_pair(xcenter+0.5,ycenter-0.5));
 			
 			//LEFT
-			voronoiPts[x][y].push_back(make_pair(xcenter-0.5,ycenter));
+			voronoiPts[x][y].push_back(make_pair(xcenter,ycenter-0.5));
 		}
 	}
 }
