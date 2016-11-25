@@ -14,8 +14,11 @@ The algorithm is divided into following parts -
 * Create voronoi regions using the similarity graph
 * Extract B-spline curves and optimize
 
+## Examples
+*Images comes here
+
 ### Prerequisites  
-* g++ 
+* G++  
 * [OpenGL](https://www.opengl.org/)
 * [GLEW: The OpenGL Extension Wrangler Library](glew.sourceforge.net/)
 * [GLUT - The OpenGL Utility Toolkit](https://www.opengl.org/resources/libraries/glut/)
