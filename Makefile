@@ -7,9 +7,9 @@ CC= g++ -g
 SRC= src/
 all:main
 
-main:common image graph voronoi
+main:common image graph voronoi spline
 	mkdir -p $(OUT)
-	$(CC) $(SRC)main.cpp $(OUT)common.o $(OUT)image.o $(OUT)graph.o $(OUT)voronoi.o -o $(OUT)depixel $(DECL) $(CPPFLAGS) -I$(INCLUDE) $(LDFLAGS)
+	$(CC) $(SRC)main.cpp $(OUT)common.o $(OUT)image.o $(OUT)graph.o $(OUT)voronoi.o $(OUT)spline.o -o $(OUT)depixel $(DECL) $(CPPFLAGS) -I$(INCLUDE) $(LDFLAGS)
 
 image:common
 	mkdir -p $(OUT)
@@ -22,6 +22,10 @@ graph:common
 voronoi:common
 	mkdir -p $(OUT)
 	$(CC) -c $(SRC)voronoi.cpp -o $(OUT)voronoi.o $(CPPFLAGS) -I$(INCLUDE) $(LDFLAGS)
+
+spline:common
+	mkdir -p $(OUT)
+	$(CC) -c $(SRC)spline.cpp -o $(OUT)spline.o $(CPPFLAGS) -I$(INCLUDE) $(LDFLAGS)
 
 common:
 	mkdir -p $(OUT)
