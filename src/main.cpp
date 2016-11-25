@@ -64,7 +64,7 @@ void display()
 	glClearColor(1.0,1.0,1.0,0.0);
 	
 	//Print Image 
-	/*
+	#ifdef PIXELS
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
@@ -79,9 +79,10 @@ void display()
 		glVertex2f(convCoordX(IMAGE_SCALE*x), convCoordY(IMAGE_SCALE*(y+1)));
 	}
 	glEnd();
-	*/
+	#endif
 
 	//Draw Voronoi Diagrams
+	#ifdef VORONOI
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
@@ -92,15 +93,11 @@ void display()
 		auto hull = (*gDiagram)(x,y);
 		//Fill Polygon
 		drawPolygon(hull, r,g,b);
-		
-		// glColor3f(0.0f, 0.0f, 0.0f);
-		// glBegin(GL_LINE_LOOP);
-		// for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
-		// if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
-		// glEnd();
 	}
-	/*
+	#endif
+
 	// Print Similarity
+	#ifdef SIM
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
@@ -113,8 +110,10 @@ void display()
 			glEnd();
 		}
 	}
+	#endif
 	
 	//Draws Voronoi Points 
+	#ifdef POINTS
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
@@ -124,7 +123,7 @@ void display()
 		for(pair<float,float> pt : (*gDiagram)(x,y)) glVertex2f(convCoordX(IMAGE_SCALE*pt.first),convCoordY(IMAGE_SCALE*pt.second));
 		glEnd();
 	}
-	*/
+	#endif
 	glutSwapBuffers();
 }
 
