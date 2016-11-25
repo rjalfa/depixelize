@@ -62,7 +62,6 @@ void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(1.0,1.0,1.0,0.0);
-	glBegin(GL_QUADS);
 	
 	//Print Image 
 	/*
@@ -94,11 +93,11 @@ void display()
 		//Fill Polygon
 		drawPolygon(hull, r,g,b);
 		
-		glColor3f(0.0f, 0.0f, 0.0f);
-		glBegin(GL_LINE_LOOP);
-		for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
-		if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
-		glEnd();
+		// glColor3f(0.0f, 0.0f, 0.0f);
+		// glBegin(GL_LINE_LOOP);
+		// for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
+		// if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
+		// glEnd();
 	}
 	/*
 	// Print Similarity
