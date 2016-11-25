@@ -45,9 +45,19 @@ _pixel::_pixel(Image* const image_ref, int R, int G, int B, int x, int y)
     this->position = make_pair(x,y);
 }
 
+//http://www.pcmag.com/encyclopedia/term/55166/yuv-rgb-conversion-formulas
+void _pixel::convertYUV(double& y,double& u, double& v)
+{
+    y = 0.299*get<0>(this->colors) + 0.587*get<1>(this->colors) + 0.114*get<2>(this->colors);
+    u = 0.492*(get<2>(this->colors) - y);
+    v = 0.877*(get<0>(this->colors) - y);      
+}
+
 void _pixel::print(ostream& out)
 {
-    out << "<<(" << position.first << "," << position.second << "):{"<<get<0>(colors)<<","<<get<1>(colors)<<","<<get<2>(colors)<<"}>>"; 
+    double y1,u1,v1;
+    this->convertYUV(y1,u1,v1);
+    out << "<<(" << position.first << "," << position.second << "):{"<<y1<<","<<u1<<","<<v1<<"}>>"; 
 }
 
 Image::Image(string file)
@@ -75,12 +85,9 @@ _pixel* Image::operator()(unsigned int i, unsigned int j)
 
 bool _pixel::isSimilar(_pixel& a)
 {
-    double y1 = 0.299*get<0>(this->colors) + 0.587*get<1>(this->colors) + 0.114*get<2>(this->colors);
-    double u1 = -0.147*get<0>(this->colors) - 0.289*get<1>(this->colors) + 0.436*get<2>(this->colors);
-    double v1 = 0.615*get<0>(this->colors) - 0.515*get<1>(this->colors) - 0.100*get<2>(this->colors);
-    double y2 = 0.299*get<0>(a.colors) + 0.587*get<1>(a.colors) + 0.114*get<2>(a.colors);
-    double u2 = -0.147*get<0>(a.colors) - 0.289*get<1>(a.colors) + 0.436*get<2>(a.colors);
-    double v2 = 0.615*get<0>(a.colors) - 0.515*get<1>(a.colors) - 0.100*get<2>(a.colors);
-    return (abs(y1-y2) < 48.0/255.0 && abs(u1-u2) < 7.0/255.0 && abs(v1-v2) < 6.0/255.0);
-//    return (abs((unsigned int)(get<0>(this->colors)-get<0>(a.colors))==0))&&(abs((unsigned int)(get<1>(this->colors)-get<1>(a.colors))==0))&&(abs((unsigned int)(get<2>(this->colors)-get<2>(a.colors))==0));
+    double y1,u1,v1;
+    this->convertYUV(y1,u1,v1);
+    double y2,u2,v2;
+    a.convertYUV(y2,u2,v2);
+    return (abs(y1-y2) < 48.0 && abs(u1-u2) < 7.0 && abs(v1-v2) < 6.0);
 }

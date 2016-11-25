@@ -36,6 +36,7 @@ class _pixel
         tuple<unsigned int,unsigned int,unsigned int> getColor() {return this->colors;};    
         bool isSimilar(_pixel& a);
         void print(ostream& out);
+        void convertYUV(double& y,double& u, double& v);
 };	
 
 class Image
