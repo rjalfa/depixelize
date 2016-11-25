@@ -2,12 +2,14 @@
 #include "image.h"
 #include "graph.h"
 #include "voronoi.h"
+#include "spline.h"
 using namespace std;
 float IMAGE_SCALE = 1.0f;
 
 Image* gImage = nullptr;
 Graph* gSimilarity = nullptr;
 Voronoi* gDiagram = nullptr;
+Spline* gCurves = nullptr;
 int majorwindow;
 void printGraph(Graph& g)
 {
@@ -125,6 +127,24 @@ void display()
 		glEnd();
 	}
 	#endif
+
+	#ifdef ACTIVE_EDGES
+	glLineWidth(50.0);
+	glBegin(GL_LINES);
+	glColor3f(0.0,0.0,1.0);
+	for(auto edge : gCurves->getActiveEdges())
+	{
+		auto color = (edge.second)->getColor();
+		float r = get<0>(color)/255.0;
+		float g = get<1>(color)/255.0;
+		float b = get<2>(color)/255.0;
+		glColor3f(r,g,b);
+		glVertex2f(convCoordX(IMAGE_SCALE*(edge.first.first.first)), convCoordY(IMAGE_SCALE*(edge.first.first.second)));
+		glVertex2f(convCoordX(IMAGE_SCALE*(edge.first.second.first)), convCoordY(IMAGE_SCALE*(edge.first.second.second)));
+	}
+	glEnd();
+	glLineWidth(1.0f);
+	#endif
 	glutSwapBuffers();
 }
 
@@ -160,10 +180,13 @@ int main(int argc, char** argv)
 	Voronoi diagram(inputImage);
 	gDiagram = &diagram;
 	diagram.createDiagram(similarity);
-	diagram.printVoronoi();
+	//diagram.printVoronoi();
 
 	//Create B-Splines on the end points of Voronoi edges.
-
+	Spline curves(&diagram);
+	gCurves = &curves;
+	curves.extractActiveEdges();
+//	cout << curves.getActiveEdges() << endl;
 	//Optimize B-Splines
 
 	//Output Image

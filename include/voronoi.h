@@ -20,6 +20,7 @@ class Voronoi
 		void collapseValence2();
 		vector<pair<float,float>> operator()(int i,int j);
 		vector<pair<float,float>> getHull(int i,int j);
+		Image* getImage() {return imageRef;};
 };
 
 #endif
