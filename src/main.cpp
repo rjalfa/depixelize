@@ -204,9 +204,7 @@ int main(int argc, char** argv)
 	curves.calculateGraph();
 
 	// Check the graph here
-	curves.printGraph();
-
-	// vector<vector<pair<float,float>>> points; 
+	mainOutLine = curves.printGraph();
 
 	// points.push_back(curves.traverseGraph(curves.));
 
@@ -216,7 +214,7 @@ int main(int argc, char** argv)
 	//Output Image
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowPosition(100,100);
+	glutInitWindowPosition(2,2);
 	glutInitWindowSize(50*inputImage.getWidth(),50*inputImage.getHeight());
 	majorwindow = glutCreateWindow("Depixelize!");
 	glutKeyboardFunc(keyboard);
