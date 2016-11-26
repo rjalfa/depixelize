@@ -62,6 +62,14 @@ void drawPolygon(vector<pair<float,float> > hull, float r, float g, float b)
 
 }
 
+// calculates 1(x1)+t(x2)+t^2(x3) for bspline points
+float evalBspline(float x1, float x2, float x3, float t)
+{
+	float res;
+	res = x1 + x2*(t) + x3*(pow(t,2));
+	return res;
+}
+
 void display()
 {
 	bool check = true;
@@ -160,41 +168,35 @@ void display()
 	glLineWidth(50.0);
 	glBegin(GL_LINES);
 	glColor3f(0.0,1.0,0.0);
-	// vector<vector<pair<float,float>>> mainOutLine;
-	cout<<"SPLINES\n";
 	for(vector<pair<float, float>> points: mainOutLine)
 	{
 		for(int i = 0; i < points.size()-1; i++)
 		{
-			cout<<"\npoints size is "<<points.size();
 			// Add three points to this vector and pass it to multiply with b-splines basis vector
 			vector<pair<float,float>> threePoints;
 			threePoints.push_back(points[i]);
-			if(check)
-				cout<<"\nPoints = "<<points[i].first<<", "<<points[i].second;
 			i++;
 			threePoints.push_back(points[i]);
-			if(check)
-				cout<<"\nPoints = "<<points[i].first<<", "<<points[i].second;
 			i++;
 			threePoints.push_back(points[i]);
-			if(check)
-				cout<<"\nPoints = "<<points[i].first<<", "<<points[i].second;	
 
-			// vector<vector<float>> thisshit = splines::getSplines(threePoints);
-			// if(check)
-			// {
-			// 	for(vector<float> c:thisshit)
-			// 	{
-			// 		for(float b:c)
-			// 		{
-			// 			cout<<"b = "<<b<<endl;
-			// 		}
-			// 	}
-			// 	check = false;
-			// }
-			check=false;
+			vector<vector<float>> matrix = gCurves->getSpline(threePoints);
+			// cout<<"okay"<<matrix.size()<<endl;
+			
+			// parameter t that will generate all the points
+			float t = 0.0;
 
+			// increment t by steps
+			float step = 0.1;
+
+			// store x,y after multiplying with 1, t and t^2
+			float xcor, ycor;
+			for(t=0.0; t<=1.0; t+=step)
+			{
+				xcor=evalBspline(matrix[0][0],matrix[1][0],matrix[2][0],t);
+				ycor=evalBspline(matrix[0][1],matrix[1][1],matrix[2][1],t);
+				glVertex2f(convCoordX(xcor), convCoordY(xcor));
+			}
 		}
 	}
 
