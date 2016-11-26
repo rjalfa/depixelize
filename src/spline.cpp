@@ -60,7 +60,23 @@ vector<pair<float,float> > Spline::traverseGraph(pair<float,float>& p)
 	return points;
 }
 
-vector<vector<float> > Spline::getSpline(vector<pair<float,float> > points)
+vector<vector<float> > Spline::getSpline(vector<pair<float,float> > points) // For 3 points
 {
+	assert(points.size() == 3);
+	//Basis Matrix for quadratic uniform b-spline
+	float B[3][3] = {{1, 1, 0},{ -2, 2, 0},{1, -2, 1}};
 
+	vector<vector<float> > a(3,vector<float>(2,0));
+	for(int i = 0 ; i < 3; i++)
+	{
+		for(int j = 0; j < 2; j++)
+		{
+			for(int k = 0 ; k < 3; k ++) 
+			{
+				if(j == 0) a[i][j] += B[i][k]*points[k].first;
+				else a[i][j] += B[i][k]*points[k].second;
+			}
+		}
+	}
+	return a;
 }
