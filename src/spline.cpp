@@ -32,3 +32,16 @@ void Spline::extractActiveEdges()
 		}
 	}
 }
+
+void Spline::createMap()
+{
+	glVertex2f(convCoordX(IMAGE_SCALE*(edge.first.first.first)), convCoordY(IMAGE_SCALE*(edge.first.first.second)));
+	for(auto edge : activeEdges)
+	{
+		if(!(splineMap.find(edge.first.first.first) == splineMap.end()))
+		{
+			
+		}
+	}
+	
+}
