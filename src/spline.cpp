@@ -32,3 +32,12 @@ void Spline::extractActiveEdges()
 		}
 	}
 }
+
+void Spline::calculateGraph()
+{
+	for(auto edge : activeEdges)
+	{
+		graph[edge.first.first].push_back(edge.first.second);
+		graph[edge.first.second].push_back(edge.first.first);
+	}
+}

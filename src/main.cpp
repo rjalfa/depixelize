@@ -94,8 +94,15 @@ void display()
 		float g = get<1>(color)/255.0;
 		float b = get<2>(color)/255.0;
 		auto hull = (*gDiagram)(x,y);
+
 		//Fill Polygon
 		drawPolygon(hull, r,g,b);
+
+		glColor3f(0.0f, 0.0f, 0.0f);
+		glBegin(GL_LINE_LOOP);
+		for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
+		if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
+		glEnd();
 	}
 	#endif
 
@@ -145,6 +152,12 @@ void display()
 	glEnd();
 	glLineWidth(1.0f);
 	#endif
+
+	#ifdef BSPLINE_OVERLAY
+	#endif
+
+	#ifdef FINAL
+	#endif
 	glutSwapBuffers();
 }
 
@@ -186,7 +199,7 @@ int main(int argc, char** argv)
 	Spline curves(&diagram);
 	gCurves = &curves;
 	curves.extractActiveEdges();
-//	cout << curves.getActiveEdges() << endl;
+	curves.calculateGraph();
 	//Optimize B-Splines
 
 	//Output Image

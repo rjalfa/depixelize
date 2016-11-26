@@ -42,14 +42,14 @@ const int direction[8][2] =
 };
 
 template<class T,class V>
-ostream& operator<<(ostream& out, pair<T,V>& p)
+ostream& operator<<(ostream& out,const pair<T,V>& p)
 {
 	out << "{" << p.first << "," << p.second << "}";
 	return out;
 }
 
 template<class T>
-ostream& operator<<(ostream& out, vector<T> v)
+ostream& operator<<(ostream& out,const vector<T>& v)
 {
 	out << "[";
 	for(int i = 0 ; i < v.size() ; i++)
@@ -60,6 +60,20 @@ ostream& operator<<(ostream& out, vector<T> v)
 	out << "]";
 	return out;
 }
+
+template<class K,class V>
+ostream& operator<<(ostream& out, const map<K,V>& v)
+{
+	out << "Map{";
+	for(auto it = v.begin(); it != v.end(); it++)
+	{
+		out << it->first << "="<<it->second;
+		out << "\n";
+	}
+	out << "}";
+	return out;
+}
+
 
 
 typedef double coord_t;         // coordinate type
