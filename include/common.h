@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <stack>
 #include <map>
+#include <set>
+#include <queue>
 #include <cassert>
 #include <GL/glew.h>
 #include <GL/glui.h>

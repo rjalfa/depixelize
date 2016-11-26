@@ -19,6 +19,8 @@ class Spline
 		vector<pair<pair<pair<float,float>,pair<float,float> >,_pixel*> >& getActiveEdges() {return activeEdges;}
 		void extractActiveEdges();
 		void calculateGraph();
+		vector<pair<float,float> > traverseGraph(pair<float,float>& p);
+		vector<vector<float> > getSpline(vector<pair<float,float> > points);
 };
 
 #endif

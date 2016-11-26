@@ -41,3 +41,26 @@ void Spline::calculateGraph()
 		graph[edge.first.second].push_back(edge.first.first);
 	}
 }
+
+vector<pair<float,float> > Spline::traverseGraph(pair<float,float>& p)
+{
+	//Contains nodes that have been visited
+	set<pair<float,float> > visitedNodes;
+	vector<pair<float,float> > points;
+	queue<pair<float,float> > q;
+	q.push(p);
+	while(!q.empty())
+	{
+		auto x = q.front();
+		q.pop();
+		visitedNodes.insert(x);
+		points.push_back(x);
+		for(auto pt : graph[x]) if(visitedNodes.find(pt) == visitedNodes.end()) q.push(pt);
+	}
+	return points;
+}
+
+vector<vector<float> > Spline::getSpline(vector<pair<float,float> > points)
+{
+
+}
