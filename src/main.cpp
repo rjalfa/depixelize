@@ -206,7 +206,8 @@ int main(int argc, char** argv)
 
 	vector<vector<pair<float,float>>> points; 
 
-	// points.push_back(curves.traverseGraph());
+	// points.push_back(curves.traverseGraph(curves.));
+
 
 	//Optimize B-Splines
 
