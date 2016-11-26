@@ -42,7 +42,7 @@ void Spline::calculateGraph()
 	}
 }
 
-void Spline::printGraph()
+vector<vector<pair<float,float>>> Spline::printGraph()
 {
 	map<pair<float,float>, vector<pair<float,float>>>::const_iterator it = graph.begin();
 	vector<pair<float, float>> visited;
@@ -66,12 +66,9 @@ void Spline::printGraph()
 				visited.push_back(list);
 			}
 			mainOutLine.push_back(points);
-		}
-
-
-		
-		
+		}		
 	}
+	return mainOutLine;
 }
 
 vector<pair<float,float> > Spline::traverseGraph(pair<float,float>& p)
