@@ -45,12 +45,32 @@ void Spline::calculateGraph()
 void Spline::printGraph()
 {
 	map<pair<float,float>, vector<pair<float,float>>>::const_iterator it = graph.begin();
+	vector<pair<float, float>> visited;
+	vector<vector<pair<float,float>>> mainOutLine;
 	for(it; it!=graph.end(); ++it)
 	{
-		cout<<"\n("<<it->first.first<<", "<<it->first.second<<") = ";
+		pair<float, float> passMe = it->first;
+		// cout<<"\n("<<it->first.first<<", "<<it->first.second<<") = ";
+		if(find(visited.begin(), visited.end(), passMe)!= visited.end())
+		{
+			// cout<<"present";
+		}
+		else
+		{
+			cout<<"\n\nnot";
+			visited.push_back(passMe);
+			vector<pair<float,float>> points = traverseGraph(passMe);
+			for(pair<float, float> list: points)
+			{
+				cout<<"("<< list.first<<", "<< list.second<<"), ";
+				visited.push_back(list);
+			}
+			mainOutLine.push_back(points);
+		}
+
+
 		
-		for(pair<float, float> list: it->second)
-			cout<<"("<< list.first<<", "<< list.second<<"), ";
+		
 	}
 }
 

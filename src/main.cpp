@@ -10,6 +10,8 @@ Image* gImage = nullptr;
 Graph* gSimilarity = nullptr;
 Voronoi* gDiagram = nullptr;
 Spline* gCurves = nullptr;
+vector<vector<pair<float,float>>> mainOutLine;
+
 int majorwindow;
 void printGraph(Graph& g)
 {
@@ -202,9 +204,9 @@ int main(int argc, char** argv)
 	curves.calculateGraph();
 
 	// Check the graph here
-	// curves.printGraph();
+	curves.printGraph();
 
-	vector<vector<pair<float,float>>> points; 
+	// vector<vector<pair<float,float>>> points; 
 
 	// points.push_back(curves.traverseGraph(curves.));
 
