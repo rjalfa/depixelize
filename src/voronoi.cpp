@@ -48,7 +48,7 @@ void Voronoi::printVoronoi()
 /*
 /	Collapse the valence-2 nodes to further simplify the voronoi diagrams
 /	valency - pair<float, float> will be mapped to it's valency
-/	Removed all those having valency 4 (added both sides), but  ignored boundary pixels
+/	Removed all those having valency 4 (added both sides), but  ignored boundary points
 */
 void Voronoi::collapseValence2()
 {

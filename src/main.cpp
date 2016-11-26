@@ -200,6 +200,9 @@ int main(int argc, char** argv)
 	gCurves = &curves;
 	curves.extractActiveEdges();
 	curves.calculateGraph();
+
+	vector<pair<float,float> > points;
+	
 	//Optimize B-Splines
 
 	//Output Image
