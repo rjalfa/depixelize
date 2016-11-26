@@ -50,19 +50,15 @@ vector<vector<pair<float,float>>> Spline::printGraph()
 	for(it; it!=graph.end(); ++it)
 	{
 		pair<float, float> passMe = it->first;
-		// cout<<"\n("<<it->first.first<<", "<<it->first.second<<") = ";
 		if(find(visited.begin(), visited.end(), passMe)!= visited.end())
 		{
-			// cout<<"present";
 		}
 		else
 		{
-			cout<<"\n\nnot";
 			visited.push_back(passMe);
 			vector<pair<float,float>> points = traverseGraph(passMe);
 			for(pair<float, float> list: points)
 			{
-				cout<<"("<< list.first<<", "<< list.second<<"), ";
 				visited.push_back(list);
 			}
 			mainOutLine.push_back(points);
@@ -95,7 +91,10 @@ vector<vector<float> > Spline::getSpline(vector<pair<float,float> > points) // F
 	//Basis Matrix for quadratic uniform b-spline
 	float B[3][3] = {{1, 1, 0},{ -2, 2, 0},{1, -2, 1}};
 
+	// 3x2 vector matrix initialized with 0
 	vector<vector<float> > a(3,vector<float>(2,0));
+
+	// multiply it with B-splines basis matrix
 	for(int i = 0 ; i < 3; i++)
 	{
 		for(int j = 0; j < 2; j++)

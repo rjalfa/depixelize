@@ -64,6 +64,7 @@ void drawPolygon(vector<pair<float,float> > hull, float r, float g, float b)
 
 void display()
 {
+	bool check = true;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(1.0,1.0,1.0,0.0);
 	
@@ -156,6 +157,50 @@ void display()
 	#endif
 
 	#ifdef BSPLINE_OVERLAY
+	glLineWidth(50.0);
+	glBegin(GL_LINES);
+	glColor3f(0.0,1.0,0.0);
+	// vector<vector<pair<float,float>>> mainOutLine;
+	cout<<"SPLINES\n";
+	for(vector<pair<float, float>> points: mainOutLine)
+	{
+		for(int i = 0; i < points.size()-1; i++)
+		{
+			cout<<"\npoints size is "<<points.size();
+			// Add three points to this vector and pass it to multiply with b-splines basis vector
+			vector<pair<float,float>> threePoints;
+			threePoints.push_back(points[i]);
+			if(check)
+				cout<<"\nPoints = "<<points[i].first<<", "<<points[i].second;
+			i++;
+			threePoints.push_back(points[i]);
+			if(check)
+				cout<<"\nPoints = "<<points[i].first<<", "<<points[i].second;
+			i++;
+			threePoints.push_back(points[i]);
+			if(check)
+				cout<<"\nPoints = "<<points[i].first<<", "<<points[i].second;	
+
+			// vector<vector<float>> thisshit = splines::getSplines(threePoints);
+			// if(check)
+			// {
+			// 	for(vector<float> c:thisshit)
+			// 	{
+			// 		for(float b:c)
+			// 		{
+			// 			cout<<"b = "<<b<<endl;
+			// 		}
+			// 	}
+			// 	check = false;
+			// }
+			check=false;
+
+		}
+	}
+
+
+	glEnd();
+	glLineWidth(1.0f);
 	#endif
 
 	#ifdef FINAL
@@ -204,6 +249,8 @@ int main(int argc, char** argv)
 	curves.calculateGraph();
 
 	// Check the graph here
+
+	// mainOutLine contains all the outline edges where we will fit the b-splines
 	mainOutLine = curves.printGraph();
 
 	// points.push_back(curves.traverseGraph(curves.));
