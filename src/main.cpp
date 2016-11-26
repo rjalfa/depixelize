@@ -201,8 +201,13 @@ int main(int argc, char** argv)
 	curves.extractActiveEdges();
 	curves.calculateGraph();
 
-	vector<pair<float,float> > points;
-	
+	// Check the graph here
+	// curves.printGraph();
+
+	vector<vector<pair<float,float>>> points; 
+
+	// points.push_back(curves.traverseGraph());
+
 	//Optimize B-Splines
 
 	//Output Image

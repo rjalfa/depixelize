@@ -21,6 +21,7 @@ class Spline
 		void calculateGraph();
 		vector<pair<float,float> > traverseGraph(pair<float,float>& p);
 		vector<vector<float> > getSpline(vector<pair<float,float> > points);
+		void printGraph();
 };
 
 #endif

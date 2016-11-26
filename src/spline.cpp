@@ -42,6 +42,18 @@ void Spline::calculateGraph()
 	}
 }
 
+void Spline::printGraph()
+{
+	map<pair<float,float>, vector<pair<float,float>>>::const_iterator it = graph.begin();
+	for(it; it!=graph.end(); ++it)
+	{
+		cout<<"\n("<<it->first.first<<", "<<it->first.second<<") = ";
+		
+		for(pair<float, float> list: it->second)
+			cout<<"("<< list.first<<", "<< list.second<<"), ";
+	}
+}
+
 vector<pair<float,float> > Spline::traverseGraph(pair<float,float>& p)
 {
 	//Contains nodes that have been visited
