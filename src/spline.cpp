@@ -47,13 +47,10 @@ vector<vector<pair<float,float>>> Spline::printGraph()
 	map<pair<float,float>, vector<pair<float,float>>>::const_iterator it = graph.begin();
 	vector<pair<float, float>> visited;
 	vector<vector<pair<float,float>>> mainOutLine;
-	for(it; it!=graph.end(); ++it)
+	for(; it!=graph.end(); ++it)
 	{
 		pair<float, float> passMe = it->first;
-		if(find(visited.begin(), visited.end(), passMe)!= visited.end())
-		{
-		}
-		else
+		if(find(visited.begin(), visited.end(), passMe) == visited.end())
 		{
 			visited.push_back(passMe);
 			vector<pair<float,float>> points = traverseGraph(passMe);
@@ -62,8 +59,8 @@ vector<vector<pair<float,float>>> Spline::printGraph()
 				visited.push_back(list);
 			}
 			mainOutLine.push_back(points);
-		}		
-	}
+		}
+	}	
 	return mainOutLine;
 }
 
@@ -101,8 +98,8 @@ vector<vector<float> > Spline::getSpline(vector<pair<float,float> > points) // F
 		{
 			for(int k = 0 ; k < 3; k ++) 
 			{
-				if(j == 0) a[i][j] += B[i][k]*points[k].first;
-				else a[i][j] += B[i][k]*points[k].second;
+				if(j == 0) a[i][j] += 0.5*B[i][k]*points[k].first;
+				else a[i][j] += 0.5*B[i][k]*points[k].second;
 			}
 		}
 	}
