@@ -73,13 +73,11 @@ void drawSpline(pair<float,float> p1, pair<float,float> p2, pair<float,float> p3
 	float t = 0.0f;
 
 	// increment t by steps
-	float step = 0.1f;
+	float step = 0.01f;
 
 	// store x,y after multiplying with 1, t and t^2
 	float xcor, ycor;
-	glBegin(GL_LINE_STRIP);
 	for(;t<=1.0f; t+=step) glVertex2f(convCoordX(evalBspline(matrix[0][0],matrix[1][0],matrix[2][0],t)), convCoordY(evalBspline(matrix[0][1],matrix[1][1],matrix[2][1],t)));
-	glEnd();
 }
 
 void display()
@@ -87,7 +85,7 @@ void display()
 	bool check = true;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(1.0,1.0,1.0,0.0);
-	
+	glEnable( GL_MULTISAMPLE );
 	//Print Image 
 	#ifdef PIXELS
 	glBegin(GL_QUADS);
@@ -177,15 +175,18 @@ void display()
 	#endif
 
 	#ifdef BSPLINE_OVERLAY
-	glLineWidth(10.0f);
+	glLineWidth(2.0f);
 	glColor3f(0.0,0.0,1.0);
 	for(vector<pair<float, float>> points: mainOutLine)
 	{
-		for(int i = 0; i < points.size()-2; i++)
+		glBegin(GL_LINE_STRIP);
+		for(int i = 0; i < points.size(); i++)
 		{
-			drawSpline(points[i],points[i+1],points[i+2]);	
+			//Completing the loop for now
+			drawSpline(points[i],points[(i+1)%points.size()],points[(i+2)%points.size()]);	
 			//i++;
 		}
+		glEnd();
 	}
 	//drawSpline(make_pair(1.f,7.f),make_pair(1.25f,6.25f),make_pair(1.f,8.f));
 	glLineWidth(1.0f);
