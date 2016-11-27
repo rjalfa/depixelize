@@ -69,11 +69,11 @@ vector<pair<float,float> > Spline::traverseGraph(pair<float,float>& p)
 	//Contains nodes that have been visited
 	set<pair<float,float> > visitedNodes;
 	vector<pair<float,float> > points;
-	queue<pair<float,float> > q;
+	stack<pair<float,float> > q;
 	q.push(p);
 	while(!q.empty())
 	{
-		auto x = q.front();
+		auto x = q.top();
 		q.pop();
 		visitedNodes.insert(x);
 		points.push_back(x);
@@ -82,6 +82,7 @@ vector<pair<float,float> > Spline::traverseGraph(pair<float,float>& p)
 	return points;
 }
 
+//REF: http://math.stackexchange.com/questions/115241/manually-deducing-the-quadratic-uniform-b-spline-basis-functions
 vector<vector<float> > Spline::getSpline(vector<pair<float,float> > points) // For 3 points
 {
 	assert(points.size() == 3);

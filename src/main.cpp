@@ -63,11 +63,23 @@ void drawPolygon(vector<pair<float,float> > hull, float r, float g, float b)
 }
 
 // calculates 1(x1)+t(x2)+t^2(x3) for bspline points
-float evalBspline(float x1, float x2, float x3, float t)
+inline float evalBspline(float x1, float x2, float x3, float t) { return x1 + x2*t + x3*t*t; }
+
+void drawSpline(pair<float,float> p1, pair<float,float> p2, pair<float,float> p3)
 {
-	float res;
-	res = x1 + x2*(t) + x3*(pow(t,2));
-	return res;
+	vector<vector<float>> matrix = gCurves->getSpline({p1,p2,p3});
+	
+	// parameter t that will generate all the points
+	float t = 0.0f;
+
+	// increment t by steps
+	float step = 0.1f;
+
+	// store x,y after multiplying with 1, t and t^2
+	float xcor, ycor;
+	glBegin(GL_LINE_STRIP);
+	for(;t<=1.0f; t+=step) glVertex2f(convCoordX(evalBspline(matrix[0][0],matrix[1][0],matrix[2][0],t)), convCoordY(evalBspline(matrix[0][1],matrix[1][1],matrix[2][1],t)));
+	glEnd();
 }
 
 void display()
@@ -165,43 +177,17 @@ void display()
 	#endif
 
 	#ifdef BSPLINE_OVERLAY
-	glLineWidth(50.0);
-	glBegin(GL_LINES);
-	glColor3f(0.0,1.0,0.0);
+	glLineWidth(10.0f);
+	glColor3f(0.0,0.0,1.0);
 	for(vector<pair<float, float>> points: mainOutLine)
 	{
-		for(int i = 0; i < points.size()-1; i++)
+		for(int i = 0; i < points.size()-2; i++)
 		{
-			// Add three points to this vector and pass it to multiply with b-splines basis vector
-			vector<pair<float,float>> threePoints;
-			threePoints.push_back(points[i]);
-			i++;
-			threePoints.push_back(points[i]);
-			i++;
-			threePoints.push_back(points[i]);
-
-			vector<vector<float>> matrix = gCurves->getSpline(threePoints);
-			// cout<<"okay"<<matrix.size()<<endl;
-			
-			// parameter t that will generate all the points
-			float t = 0.0;
-
-			// increment t by steps
-			float step = 0.1;
-
-			// store x,y after multiplying with 1, t and t^2
-			float xcor, ycor;
-			for(t=0.0; t<=1.0; t+=step)
-			{
-				xcor=evalBspline(matrix[0][0],matrix[1][0],matrix[2][0],t);
-				ycor=evalBspline(matrix[0][1],matrix[1][1],matrix[2][1],t);
-				glVertex2f(convCoordX(xcor), convCoordY(xcor));
-			}
+			drawSpline(points[i],points[i+1],points[i+2]);	
+			//i++;
 		}
 	}
-
-
-	glEnd();
+	//drawSpline(make_pair(1.f,7.f),make_pair(1.25f,6.25f),make_pair(1.f,8.f));
 	glLineWidth(1.0f);
 	#endif
 
@@ -254,13 +240,14 @@ int main(int argc, char** argv)
 
 	// mainOutLine contains all the outline edges where we will fit the b-splines
 	mainOutLine = curves.printGraph();
-
+	cout << mainOutLine << endl;
 	// points.push_back(curves.traverseGraph(curves.));
 
 
 	//Optimize B-Splines
 
 	//Output Image
+	#ifndef NO_RENDER
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowPosition(2,2);
@@ -277,5 +264,6 @@ int main(int argc, char** argv)
 	glutIdleFunc(idleFunction);
 	glutDisplayFunc(display);
 	glutMainLoop();
+	#endif
 	return 0;
 }
