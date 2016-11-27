@@ -241,9 +241,7 @@ int main(int argc, char** argv)
 
 	// mainOutLine contains all the outline edges where we will fit the b-splines
 	mainOutLine = curves.printGraph();
-	cout << mainOutLine << endl;
-	// points.push_back(curves.traverseGraph(curves.));
-
+	
 
 	//Optimize B-Splines
 

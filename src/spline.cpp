@@ -2,14 +2,14 @@
 
 _pixel* darker(_pixel* a, _pixel* b)
 {
-	if(a->getColor() > b->getColor()) return a;
+	if(a->getColor() < b->getColor()) return a;
 	return b;
 }
 
 void Spline::extractActiveEdges()
 {
 	if(this->diagram == nullptr) return;
-	map<pair<pair<float,float>,pair<float,float> >,_pixel*> edgeEnum;
+	map<Edge,_pixel*> edgeEnum;
 	Image* imageRef = this->diagram->getImage(); 
 	int width = imageRef->getWidth();
 	int height = imageRef->getHeight();
@@ -42,18 +42,18 @@ void Spline::calculateGraph()
 	}
 }
 
-vector<vector<pair<float,float>>> Spline::printGraph()
+vector<vector<Point>> Spline::printGraph()
 {
-	map<pair<float,float>, vector<pair<float,float>>>::const_iterator it = graph.begin();
+	map<Point, vector<Point>>::const_iterator it = graph.begin();
 	vector<pair<float, float>> visited;
-	vector<vector<pair<float,float>>> mainOutLine;
+	vector<vector<Point>> mainOutLine;
 	for(; it!=graph.end(); ++it)
 	{
 		pair<float, float> passMe = it->first;
 		if(find(visited.begin(), visited.end(), passMe) == visited.end())
 		{
 			visited.push_back(passMe);
-			vector<pair<float,float>> points = traverseGraph(passMe);
+			vector<Point> points = traverseGraph(passMe);
 			for(pair<float, float> list: points)
 			{
 				visited.push_back(list);
@@ -64,12 +64,12 @@ vector<vector<pair<float,float>>> Spline::printGraph()
 	return mainOutLine;
 }
 
-vector<pair<float,float> > Spline::traverseGraph(pair<float,float>& p)
+vector<Point > Spline::traverseGraph(Point& p)
 {
 	//Contains nodes that have been visited
-	set<pair<float,float> > visitedNodes;
-	vector<pair<float,float> > points;
-	stack<pair<float,float> > q;
+	set<Point > visitedNodes;
+	vector<Point > points;
+	stack<Point > q;
 	q.push(p);
 	while(!q.empty())
 	{
@@ -83,7 +83,7 @@ vector<pair<float,float> > Spline::traverseGraph(pair<float,float>& p)
 }
 
 //REF: http://math.stackexchange.com/questions/115241/manually-deducing-the-quadratic-uniform-b-spline-basis-functions
-vector<vector<float> > Spline::getSpline(vector<pair<float,float> > points) // For 3 points
+vector<vector<float> > Spline::getSpline(vector<Point > points) // For 3 points
 {
 	assert(points.size() == 3);
 	//Basis Matrix for quadratic uniform b-spline

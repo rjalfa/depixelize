@@ -26,14 +26,14 @@ public:
 class _pixel
 {
 	Image* image_ref;
-	tuple<unsigned int,unsigned int,unsigned int> colors;
+	Color colors;
 	pair<unsigned int,unsigned int> position;
 	public:
         _pixel(Image* const image_ref, int R, int G, int B, int x, int y);
         _pixel() : image_ref(nullptr) {};
         unsigned int getX() {return this->position.first;}
         unsigned int getY() {return this->position.second;}
-        tuple<unsigned int,unsigned int,unsigned int> getColor() {return this->colors;};    
+        Color getColor() {return this->colors;};    
         bool isSimilar(_pixel& a);
         void print(ostream& out);
         void convertYUV(double& y,double& u, double& v);

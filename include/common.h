@@ -21,6 +21,10 @@
 #include <GL/freeglut.h>
 using namespace std;
 
+using Point = pair<float,float>;
+using Edge = pair<Point,Point>;
+using Color = tuple<unsigned int,unsigned int,unsigned int>;
+
 //DIRECTION MACROS
 #define TOP 1
 #define TOP_RIGHT 2
@@ -75,21 +79,5 @@ ostream& operator<<(ostream& out, const map<K,V>& v)
 	out << "}";
 	return out;
 }
-
-
-
-typedef double coord_t;         // coordinate type
-typedef double coord2_t;  // must be big enough to hold 2*max(|coordinate|)^2
-
-struct Point {
-	coord_t x, y;
-public:
-	Point(coord_t _x,coord_t _y) {x=_x;y=_y;}
-	Point():x(0),y(0) {}
-	bool operator <(const Point &p) const {
-		return x < p.x || (x == p.x && y < p.y);
-	}
-};
-vector<Point> convex_hull(vector<Point> P);
 
 #endif
