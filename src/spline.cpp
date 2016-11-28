@@ -2,8 +2,14 @@
 
 _pixel* darker(_pixel* a, _pixel* b)
 {
-	if(a->getColor() < b->getColor()) return a;
-	return b;
+
+    double y1,u1,v1;
+    convertYUV(a->getColor(),y1,u1,v1);
+    double y2,u2,v2;
+    convertYUV(b->getColor(),y2,u2,v2);
+    if(y1 < y2) return a;
+    else return b;
+//    return (abs(y1-y2) < 48.0 && abs(u1-u2) < 7.0 && abs(v1-v2) < 6.0);
 }
 
 void Spline::extractActiveEdges()
@@ -44,45 +50,16 @@ void Spline::calculateGraph()
 
 vector<pair<vector<Point>,Color> > Spline::printGraph()
 {
-	/*
-	map<Point, vector<Point>>::const_iterator it = graph.begin();
-	vector<pair<float, float>> visited;
-	vector<pair<vector<Point>,Color> > mainOutLine;
-	for(; it!=graph.end(); ++it)
-	{
-		pair<float, float> passMe = it->first;
-		if(find(visited.begin(), visited.end(), passMe) == visited.end())
-		{
-			visited.push_back(passMe);
-			vector<Point> points = traverseGraph(passMe);
-			for(pair<float, float> list: points)
-			{
-				visited.push_back(list);
-			}
-			if( find(
-					graph[points[points.size()-1]].begin(),
-					graph[points[points.size()-1]].end(),
-					points[0]) != graph[points[points.size()-1]].end()) {
-				points.push_back(points[0]);
-				if(points.size() > 1) points.push_back(points[1]);
-			}
-			mainOutLine.push_back(make_pair(points,Color(0.0f,0.0f,0.0f)));
-		}
-	}	
-	return mainOutLine;
-	*/
-	//Adding 
 	vector<pair<vector<Point>,Color> > mainOutLine;
 	map<Point, set<pair<Point,Color> > >::iterator vertexPt = graph.begin();
 	while(vertexPt != graph.end())
 	{
-		while((vertexPt->second).size())
+		while((vertexPt->second).size() > 0)
 		{
 			Point src = (vertexPt->second).begin()->first;
 			Color c = (vertexPt->second).begin()->second;
 			vector<Point> v = traverseGraph(src, c);
 			mainOutLine.push_back(make_pair(v,c));
-			//cout << v <<" " << c << endl;
 		}
 		vertexPt ++;
 	}
@@ -94,21 +71,25 @@ vector<Point > Spline::traverseGraph(const Point& p, const Color& c)
 	//Contains nodes that have been visited
 	vector<Point> points;
 	Point x = p;
+	Point prev = Point(-1,-1);
+	Color curr = c;
 	bool found = true;
 	while(true)
 	{
 		points.push_back(x);
 		for(set<pair<Point,Color> >::iterator it = graph[x].begin(); it != graph[x].end(); it++) 
 		{
+			if(it->first == prev) continue;
 			//If color of a node is similar to that of one vertex in the adj list, then connect tha node.
 			if(isSimilar(it->second,c)) {
 				Point p2 = it->first;
 				//cerr << x << "->" << graph[x] << " " << it->first<< "->" << " " << graph[it->first] << endl;
 				set<pair<Point,Color> >::iterator it1;
 				for(it1 = graph[p2].begin(); it1 != graph[p2].end(); it1++) {
-					if(isSimilar(c,it1->second) && it1->first == x) break;
+					if(isSimilar(curr,it1->second) && it1->first == x) break;
 				}
 				assert(it1 != graph[p2].end());
+				curr = it->second;
 				graph[x].erase(it);
 				graph[p2].erase(it1);
 				//cerr << x << "->" << graph[x] << " " << p2<< "->" << " " << graph[p2] << endl;

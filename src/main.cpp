@@ -70,14 +70,14 @@ void drawSpline(pair<float,float> p1, pair<float,float> p2, pair<float,float> p3
 	vector<vector<float>> matrix = gCurves->getSpline({p1,p2,p3});
 	
 	// parameter t that will generate all the points
-	float t = 0.0f;
+	float t = -0.1f;
 
 	// increment t by steps
 	float step = 0.01f;
 
 	// store x,y after multiplying with 1, t and t^2
 	float xcor, ycor;
-	for(;t<=1.0f; t+=step) glVertex2f(convCoordX(evalBspline(matrix[0][0],matrix[1][0],matrix[2][0],t)), convCoordY(evalBspline(matrix[0][1],matrix[1][1],matrix[2][1],t)));
+	for(;t<=1.1f; t+=step) glVertex2f(convCoordX(evalBspline(matrix[0][0],matrix[1][0],matrix[2][0],t)), convCoordY(evalBspline(matrix[0][1],matrix[1][1],matrix[2][1],t)));
 }
 
 void display()
@@ -175,8 +175,7 @@ void display()
 	#endif
 
 	#ifdef BSPLINE_OVERLAY
-	glLineWidth(8.0f);
-	//glColor3f(0.0,0.0,1.0);
+	glLineWidth(5.0f);
 	for(pair<vector<Point>,Color> curve: mainOutLine)
 	{
 		auto points = curve.first;
@@ -187,7 +186,6 @@ void display()
 		float b = get<2>(color)/255.0;
 		glColor3f(r,g,b);
 		glBegin(GL_LINE_STRIP);
-		cout << points << endl;
 		for(int i = 0; i < points.size()-2; i++)
 		{
 			drawSpline(points[i],points[(i+1)%points.size()],points[(i+2)%points.size()]);	

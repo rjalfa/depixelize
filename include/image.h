@@ -35,6 +35,7 @@ class _pixel
         unsigned int getY() {return this->position.second;}
         Color getColor() {return this->colors;};    
         bool isSimilar(_pixel& a);
+        bool isSimilar2(_pixel& a);
         void print(ostream& out);
         void convertYUV(double& y,double& u, double& v);
 };	

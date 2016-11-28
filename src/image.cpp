@@ -91,3 +91,13 @@ bool _pixel::isSimilar(_pixel& a)
     a.convertYUV(y2,u2,v2);
     return (abs(y1-y2) < 48.0 && abs(u1-u2) < 7.0 && abs(v1-v2) < 6.0);
 }
+
+//Softer isSimilar
+bool _pixel::isSimilar2(_pixel& a)
+{
+    double y1,u1,v1;
+    this->convertYUV(y1,u1,v1);
+    double y2,u2,v2;
+    a.convertYUV(y2,u2,v2);
+    return (abs(y1-y2) < 20+48.0 && abs(u1-u2) < 20+7.0 && abs(v1-v2) < 20+6.0);
+}
