@@ -98,7 +98,8 @@ vector<Point > Spline::traverseGraph(const Point& p, const Color& c)
 				for(it1 = graph[p2].begin(); it1 != graph[p2].end(); it1++) {
 					if(isSimilar(curr,it1->second) && it1->first == x) break;
 				}
-				assert(it1 != graph[p2].end());
+				
+				if(it1 == graph[p2].end()) break;
 				curr = it->second;
 				graph[x].erase(it);
 				graph[p2].erase(it1);
