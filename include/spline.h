@@ -12,16 +12,16 @@ class Spline
 {
 	Voronoi* diagram;
 	vector<pair<Edge,_pixel*> > activeEdges;
-	map<Point, vector<Point> > graph;
+	map<Point, set<pair<Point,Color> > > graph;
 	public:
 		Spline(Voronoi* d) : diagram(d) {};
 		Spline() : diagram(nullptr) {};
 		vector<pair<Edge,_pixel*> >& getActiveEdges() {return activeEdges;}
 		void extractActiveEdges();
 		void calculateGraph();
-		vector<Point> traverseGraph(Point& p);
+		vector<Point > traverseGraph(const Point& p, const Color& c);
 		vector<vector<float> > getSpline(vector<Point> points);
-		vector<vector<Point> > printGraph();
+		vector<pair<vector<Point>,Color> > printGraph();
 };
 
 #endif

@@ -10,7 +10,7 @@ Image* gImage = nullptr;
 Graph* gSimilarity = nullptr;
 Voronoi* gDiagram = nullptr;
 Spline* gCurves = nullptr;
-vector<vector<pair<float,float>>> mainOutLine;
+vector<pair<vector<Point>,Color> > mainOutLine;
 
 int majorwindow;
 void printGraph(Graph& g)
@@ -119,11 +119,11 @@ void display()
 		//Fill Polygon
 		drawPolygon(hull, r,g,b);
 
-		glColor3f(0.0f, 0.0f, 0.0f);
+		/*glColor3f(0.0f, 0.0f, 0.0f);
 		glBegin(GL_LINE_LOOP);
 		for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
 		if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
-		glEnd();
+		glEnd();*/
 	}
 	#endif
 
@@ -175,18 +175,26 @@ void display()
 	#endif
 
 	#ifdef BSPLINE_OVERLAY
-	glLineWidth(2.0f);
-	glColor3f(0.0,0.0,1.0);
-	for(vector<pair<float, float>> points: mainOutLine)
+	glLineWidth(8.0f);
+	//glColor3f(0.0,0.0,1.0);
+	for(pair<vector<Point>,Color> curve: mainOutLine)
 	{
+		auto points = curve.first;
+		auto color = curve.second;
+		if(points.size() < 2) continue;
+		float r = get<0>(color)/255.0;
+		float g = get<1>(color)/255.0;
+		float b = get<2>(color)/255.0;
+		glColor3f(r,g,b);
 		glBegin(GL_LINE_STRIP);
-		for(int i = 0; i < points.size(); i++)
+		cout << points << endl;
+		for(int i = 0; i < points.size()-2; i++)
 		{
-			//Completing the loop for now
 			drawSpline(points[i],points[(i+1)%points.size()],points[(i+2)%points.size()]);	
 			//i++;
 		}
 		glEnd();
+		//break;
 	}
 	//drawSpline(make_pair(1.f,7.f),make_pair(1.25f,6.25f),make_pair(1.f,8.f));
 	glLineWidth(1.0f);
@@ -241,8 +249,7 @@ int main(int argc, char** argv)
 
 	// mainOutLine contains all the outline edges where we will fit the b-splines
 	mainOutLine = curves.printGraph();
-	
-
+	//cout << mainOutLine << endl;
 	//Optimize B-Splines
 
 	//Output Image

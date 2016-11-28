@@ -80,4 +80,45 @@ ostream& operator<<(ostream& out, const map<K,V>& v)
 	return out;
 }
 
+template<class K>
+ostream& operator<<(ostream& out, const set<K>& s)
+{
+	out << "{";
+	for(auto it = s.begin(); it != s.end(); it ++)
+	{
+		out << *it;
+		if(next(it) != s.end()) out << ", ";
+	}
+	out << "}";
+	return out;
+}
+
+namespace aux{
+template<std::size_t...> struct seq{};
+
+template<std::size_t N, std::size_t... Is>
+struct gen_seq : gen_seq<N-1, N-1, Is...>{};
+
+template<std::size_t... Is>
+struct gen_seq<0, Is...> : seq<Is...>{};
+
+template<class Ch, class Tr, class Tuple, std::size_t... Is>
+void print_tuple(std::basic_ostream<Ch,Tr>& os, Tuple const& t, seq<Is...>){
+  using swallow = int[];
+  (void)swallow{0, (void(os << (Is == 0? "" : ", ") << std::get<Is>(t)), 0)...};
+}
+} // aux::
+
+template<class Ch, class Tr, class... Args>
+auto operator<<(std::basic_ostream<Ch, Tr>& os, std::tuple<Args...> const& t)
+    -> std::basic_ostream<Ch, Tr>&
+{
+  os << "(";
+  aux::print_tuple(os, t, aux::gen_seq<sizeof...(Args)>());
+  return os << ")";
+}
+
+void convertYUV(const Color& colors,double& y,double& u, double& v);
+bool isSimilar(const Color& a, const Color& b);
+
 #endif

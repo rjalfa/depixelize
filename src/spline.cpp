@@ -37,16 +37,17 @@ void Spline::calculateGraph()
 {
 	for(auto edge : activeEdges)
 	{
-		graph[edge.first.first].push_back(edge.first.second);
-		graph[edge.first.second].push_back(edge.first.first);
+		graph[edge.first.first].insert(make_pair(edge.first.second,edge.second->getColor()));
+		graph[edge.first.second].insert(make_pair(edge.first.first,edge.second->getColor()));
 	}
 }
 
-vector<vector<Point>> Spline::printGraph()
+vector<pair<vector<Point>,Color> > Spline::printGraph()
 {
+	/*
 	map<Point, vector<Point>>::const_iterator it = graph.begin();
 	vector<pair<float, float>> visited;
-	vector<vector<Point>> mainOutLine;
+	vector<pair<vector<Point>,Color> > mainOutLine;
 	for(; it!=graph.end(); ++it)
 	{
 		pair<float, float> passMe = it->first;
@@ -58,26 +59,71 @@ vector<vector<Point>> Spline::printGraph()
 			{
 				visited.push_back(list);
 			}
-			mainOutLine.push_back(points);
+			if( find(
+					graph[points[points.size()-1]].begin(),
+					graph[points[points.size()-1]].end(),
+					points[0]) != graph[points[points.size()-1]].end()) {
+				points.push_back(points[0]);
+				if(points.size() > 1) points.push_back(points[1]);
+			}
+			mainOutLine.push_back(make_pair(points,Color(0.0f,0.0f,0.0f)));
 		}
 	}	
 	return mainOutLine;
+	*/
+	//Adding 
+	vector<pair<vector<Point>,Color> > mainOutLine;
+	map<Point, set<pair<Point,Color> > >::iterator vertexPt = graph.begin();
+	while(vertexPt != graph.end())
+	{
+		while((vertexPt->second).size())
+		{
+			Point src = (vertexPt->second).begin()->first;
+			Color c = (vertexPt->second).begin()->second;
+			vector<Point> v = traverseGraph(src, c);
+			mainOutLine.push_back(make_pair(v,c));
+			//cout << v <<" " << c << endl;
+		}
+		vertexPt ++;
+	}
+	return mainOutLine;
 }
 
-vector<Point > Spline::traverseGraph(Point& p)
+vector<Point > Spline::traverseGraph(const Point& p, const Color& c)
 {
 	//Contains nodes that have been visited
-	set<Point > visitedNodes;
-	vector<Point > points;
-	stack<Point > q;
-	q.push(p);
-	while(!q.empty())
+	vector<Point> points;
+	Point x = p;
+	bool found = true;
+	while(true)
 	{
-		auto x = q.top();
-		q.pop();
-		visitedNodes.insert(x);
 		points.push_back(x);
-		for(auto pt : graph[x]) if(visitedNodes.find(pt) == visitedNodes.end()) q.push(pt);
+		for(set<pair<Point,Color> >::iterator it = graph[x].begin(); it != graph[x].end(); it++) 
+		{
+			//If color of a node is similar to that of one vertex in the adj list, then connect tha node.
+			if(isSimilar(it->second,c)) {
+				Point p2 = it->first;
+				//cerr << x << "->" << graph[x] << " " << it->first<< "->" << " " << graph[it->first] << endl;
+				set<pair<Point,Color> >::iterator it1;
+				for(it1 = graph[p2].begin(); it1 != graph[p2].end(); it1++) {
+					if(isSimilar(c,it1->second) && it1->first == x) break;
+				}
+				assert(it1 != graph[p2].end());
+				graph[x].erase(it);
+				graph[p2].erase(it1);
+				//cerr << x << "->" << graph[x] << " " << p2<< "->" << " " << graph[p2] << endl;
+				//cerr << "======\n";
+				x = p2;
+				found = true;
+				break;
+			}
+		}
+		if(!found) break;
+		found = false;
+	}
+	if(points.size() > 2 && *points.begin() == *points.rbegin()) 
+	{
+		points.push_back(points[1]);
 	}
 	return points;
 }
