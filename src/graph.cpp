@@ -1,19 +1,22 @@
 #include "graph.h"
 
+//Checks if the requested pixel is in range of the image
 bool isValid(int x,int y, int w, int h)
 {
 	return (x>=0 && x<w && y>=0 && y<h);
 }
 
+
 Graph::Graph(Image& imageI)
 {
+	//Innitializing variables from Image
 	this->image = &imageI;
 	int h = image->getHeight();
 	int w = image->getWidth();
 
 	//Semantic
 	// edges[i][j][k] -> denotes whether there is a an edge from (i,j) in kth direction in the graph
-
+	//Preallocating structures
 	for(int i = 0; i < w; i++) 
 	{
 		vector<vector<bool>> v1;
@@ -26,7 +29,8 @@ Graph::Graph(Image& imageI)
 		edges.push_back(v1);
 		weights.push_back(v2);
 	}
-	//Add edge if similar color
+
+	//Add edge in kth direction of (x,y) of (x,y)+k is valid cell and has similar color
 	for(int i = 0 ; i < w ; i++) for(int j = 0; j < h; j++) for(int k = 0 ; k < 8; k ++) {
 		if((*image)(i+direction[k][0],j+direction[k][1]) != nullptr) edges[i][j][k] = (*image)(i,j)->isSimilar(*(*image)(i+direction[k][0],j+direction[k][1]));
 	}
@@ -56,26 +60,31 @@ void Graph::removeCross()
 
 int Graph::valence(int x,int y)
 {
+	//Checks for out of range input
 	if(x < 0 || x >= this->image->getWidth()) return -1;
 	if(y < 0 || y >= this->image->getHeight()) return -1;
 
+	//Count the edges around the pixel
 	int cnt = 0;
 	for(int i = 0; i < 8 ; i++) if(edges[x][y][i] == true) cnt ++;
 	return cnt;
 }
 
-
+//Checks if (x,y) are inclusively inside the given cell
 bool insideBounds(int x, int y, int row_st, int row_end, int col_st, int col_end)
 {
 	return (x>=row_st && x <= row_end && y >= col_st && y <= col_end);
 }
 
+//Curves Heuristic
 void Graph::curves_heuristic(int x, int y)
 {
 	//Directions are (x,y) BOTTOM_RIGHT, and Right(x,y) BOTTOM_LEFT
+	//A : feature for (x,y) BOTTOM_RIGHT and B : (x,y) + Right BOTTOM_LEFT
 	int featureA = 0;
 	int featureB = 0;
 
+	//Find curve lengths in both directions for A
 	int p = x, q = y;
 	int dir = BOTTOM_RIGHT;
 	while(true)
@@ -106,6 +115,7 @@ void Graph::curves_heuristic(int x, int y)
 		q = q + direction[dir][1];
 	}
 
+	//Find curve lengths in both directions for B
 	p = x+direction[RIGHT][0];
 	q = y+direction[RIGHT][1];
 	dir = BOTTOM_LEFT;	
@@ -139,6 +149,7 @@ void Graph::curves_heuristic(int x, int y)
 		q = q + direction[dir][1];
 	}
 	
+	//Bigger curve is better, add difference to corresponding edge weight
 	if(featureA < featureB) {
 		weights[x+direction[RIGHT][0]][y+direction[RIGHT][1]][BOTTOM_LEFT] += (featureB - featureA);
 		weights[x+direction[BOTTOM][0]][y+direction[BOTTOM][1]][TOP_RIGHT] += (featureB - featureA);
@@ -150,6 +161,7 @@ void Graph::curves_heuristic(int x, int y)
 	}
 }
 
+//Checks for Isolated pixels
 void Graph::islands_heuristic(int x,int y)
 {
 	for(int i = 0; i < 8; i++) if(edges[x][y][i] == true) 
@@ -213,6 +225,8 @@ void Graph::sparse_pixels_heuristic(int x, int y)
 		if(labels[i][j] == 1) componentA++;
 		else if(labels[i][j] == 2) componentB++;
 	}
+
+	//Smaller component is better
 	if(componentA > componentB) 
 	{
 		weights[x+direction[RIGHT][0]][y+direction[RIGHT][1]][BOTTOM_LEFT] += (componentA-componentB);
@@ -246,11 +260,14 @@ void Graph::planarize()
 			if(this->edges[topLeft->getX()][topLeft->getY()][RIGHT]) continue;
 			if(this->edges[bottomRight->getX()][bottomRight->getY()][TOP]) continue;
 			if(this->edges[bottomRight->getX()][bottomRight->getY()][LEFT]) continue;
+
+			//Run heuristics for weight
 			this->islands_heuristic(topLeft->getX(),topLeft->getY());
 			this->islands_heuristic(topRight->getX(),topRight->getY());
 			this->curves_heuristic(topLeft->getX(),topLeft->getY());
 			this->sparse_pixels_heuristic(topLeft->getX(),topLeft->getY());
 
+			//Remove the lighter edge. And both if they are equal
 			if(this->weights[topLeft->getX()][topLeft->getY()][BOTTOM_RIGHT] <= this->weights[topRight->getX()][topRight->getY()][BOTTOM_LEFT])
 			{
 				this->edges[topLeft->getX()][topLeft->getY()][BOTTOM_RIGHT] = false;

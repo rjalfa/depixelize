@@ -1,5 +1,6 @@
 #include "spline.h"
 
+//Returns the darker pixel by Y luminescence value
 _pixel* darker(_pixel* a, _pixel* b)
 {
 
@@ -12,10 +13,15 @@ _pixel* darker(_pixel* a, _pixel* b)
 //    return (abs(y1-y2) < 48.0 && abs(u1-u2) < 7.0 && abs(v1-v2) < 6.0);
 }
 
+//Extracts active edges from voronoi diagrams
 void Spline::extractActiveEdges()
 {
 	if(this->diagram == nullptr) return;
+	
+	//For keeping the edges detected till now.
 	map<Edge,_pixel*> edgeEnum;
+
+	//Get image dimensions
 	Image* imageRef = this->diagram->getImage(); 
 	int width = imageRef->getWidth();
 	int height = imageRef->getHeight();
@@ -26,6 +32,8 @@ void Spline::extractActiveEdges()
 		{
 			for(int i = 0 ; i < (*this->diagram)(x,y).size(); i++) 
 			{
+
+				//Looping over the voronoi hull, of point (x,y), we find the edges which have different colored pixels on either side, and add to active edges.
 				int l = i;
 				int r = (i+1)%((*this->diagram)(x,y).size());
 				if(edgeEnum.find(make_pair((*this->diagram)(x,y)[r],(*this->diagram)(x,y)[l])) != edgeEnum.end()) 
@@ -41,6 +49,7 @@ void Spline::extractActiveEdges()
 
 void Spline::calculateGraph()
 {
+	//Convert edge list to adjacency list
 	for(auto edge : activeEdges)
 	{
 		graph[edge.first.first].insert(make_pair(edge.first.second,edge.second->getColor()));
@@ -50,6 +59,7 @@ void Spline::calculateGraph()
 
 vector<pair<vector<Point>,Color> > Spline::printGraph()
 {
+	//Tracing curves. Starting with a random node, We trace out a curve with same colors
 	vector<pair<vector<Point>,Color> > mainOutLine;
 	map<Point, set<pair<Point,Color> > >::iterator vertexPt = graph.begin();
 	while(vertexPt != graph.end())

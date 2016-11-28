@@ -1,7 +1,6 @@
 #include "image.h"
 
-
-
+//File loading 
 BMP::BMP(const char* FilePath)
 {
     std::fstream hFile(FilePath, std::ios::in | std::ios::binary);
@@ -36,7 +35,6 @@ BMP::BMP(const char* FilePath)
     hFile.read(reinterpret_cast<char*>(Pixels.data()), size);
     hFile.close();
 }
-
 
 _pixel::_pixel(Image* const image_ref, int R, int G, int B, int x, int y)
 {

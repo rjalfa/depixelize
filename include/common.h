@@ -3,6 +3,7 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
+//Header Files
 #include <cstdio>
 #include <tuple>
 #include <utility>
@@ -15,17 +16,20 @@
 #include <set>
 #include <queue>
 #include <cassert>
+
+//OpenGL Header files
 #include <GL/glew.h>
 #include <GL/glui.h>
 #include <GL/gl.h>
 #include <GL/freeglut.h>
 using namespace std;
 
+//Some type definitions for code brevity
 using Point = pair<float,float>;
 using Edge = pair<Point,Point>;
 using Color = tuple<unsigned int,unsigned int,unsigned int>;
 
-//DIRECTION MACROS
+//DIRECTION MACROS : Used for defining directions
 #define TOP 1
 #define TOP_RIGHT 2
 #define TOP_LEFT 0
@@ -35,6 +39,7 @@ using Color = tuple<unsigned int,unsigned int,unsigned int>;
 #define BOTTOM_RIGHT 7
 #define BOTTOM_LEFT 5
 
+//
 const int direction[8][2] = 
 {
 	{-1,-1},
@@ -47,6 +52,7 @@ const int direction[8][2] =
 	{1,1}
 };
 
+//Pretty print C++ structures
 template<class T,class V>
 ostream& operator<<(ostream& out,const pair<T,V>& p)
 {
@@ -93,6 +99,7 @@ ostream& operator<<(ostream& out, const set<K>& s)
 	return out;
 }
 
+//http://stackoverflow.com/questions/6245735/pretty-print-stdtuple
 namespace aux{
 template<std::size_t...> struct seq{};
 
@@ -118,7 +125,12 @@ auto operator<<(std::basic_ostream<Ch, Tr>& os, std::tuple<Args...> const& t)
   return os << ")";
 }
 
+//Some system wide functions
+
+//Converts RGB tuple to YUV values
 void convertYUV(const Color& colors,double& y,double& u, double& v);
+
+//Checks if 2 colors are same, as per the spec given in paper.
 bool isSimilar(const Color& a, const Color& b);
 
 #endif

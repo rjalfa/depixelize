@@ -6,6 +6,7 @@
 using namespace std;
 float IMAGE_SCALE = 1.0f;
 
+//Global vars for use in render()
 Image* gImage = nullptr;
 Graph* gSimilarity = nullptr;
 Voronoi* gDiagram = nullptr;
@@ -13,6 +14,8 @@ Spline* gCurves = nullptr;
 vector<pair<vector<Point>,Color> > mainOutLine;
 
 int majorwindow;
+
+//Pretty Print graph to cout
 void printGraph(Graph& g)
 {
 	cout<<"Printing graph"<<endl;
@@ -33,6 +36,7 @@ void printGraph(Graph& g)
 	}
 }
 
+//keyboard() for ESC functionality
 void keyboard(unsigned char key, int x, int y)
 {
 	switch(key)
@@ -41,16 +45,20 @@ void keyboard(unsigned char key, int x, int y)
   	}
 }
 
+//Converts (0,w) -> (-1, 1)
 float convCoordX(float x)
 {
 	return (2*x)/(IMAGE_SCALE*(gImage->getWidth())) - 1;
 }
 
+
+//Converts (0,h) -> (-1, 1)
 float convCoordY(float y)
 {
 	return (2*y)/(IMAGE_SCALE*(gImage->getHeight())) - 1;
 }
 
+//Function to draw a closed convex polygon with fill color.
 void drawPolygon(vector<pair<float,float> > hull, float r, float g, float b)
 {
 	glColor3f(r,g,b);
@@ -65,9 +73,11 @@ void drawPolygon(vector<pair<float,float> > hull, float r, float g, float b)
 // calculates 1(x1)+t(x2)+t^2(x3) for bspline points
 inline float evalBspline(float x1, float x2, float x3, float t) { return x1 + x2*t + x3*t*t; }
 
+//Function to draw a q-u-b spline curve from 3 control points
 void drawSpline(pair<float,float> p1, pair<float,float> p2, pair<float,float> p3)
 {
 	vector<vector<float>> matrix = gCurves->getSpline({p1,p2,p3});
+	//T is extroplated a little for intersecting pieces
 	
 	// parameter t that will generate all the points
 	float t = -0.1f;
@@ -80,13 +90,15 @@ void drawSpline(pair<float,float> p1, pair<float,float> p2, pair<float,float> p3
 	for(;t<=1.1f; t+=step) glVertex2f(convCoordX(evalBspline(matrix[0][0],matrix[1][0],matrix[2][0],t)), convCoordY(evalBspline(matrix[0][1],matrix[1][1],matrix[2][1],t)));
 }
 
+//Render Function
 void display()
 {
 	bool check = true;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(1.0,1.0,1.0,0.0);
 	glEnable( GL_MULTISAMPLE );
-	//Print Image 
+	
+	//Print Image [PIXELS]
 	#ifdef PIXELS
 	glBegin(GL_QUADS);
 	for(int x = 0 ; x < gImage->getWidth(); x++)
@@ -119,6 +131,7 @@ void display()
 		//Fill Polygon
 		drawPolygon(hull, r,g,b);
 
+		//Draw boundaries of reshaped cells
 		/*glColor3f(0.0f, 0.0f, 0.0f);
 		glBegin(GL_LINE_LOOP);
 		for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
@@ -127,7 +140,7 @@ void display()
 	}
 	#endif
 
-	// Print Similarity
+	// Print Similarity graph
 	#ifdef SIM
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
@@ -143,7 +156,7 @@ void display()
 	}
 	#endif
 	
-	//Draws Voronoi Points 
+	//Draws Voronoi Points around the pixels
 	#ifdef POINTS
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
@@ -156,6 +169,7 @@ void display()
 	}
 	#endif
 
+	//Draws active edges selected by Spline for curve tracing
 	#ifdef ACTIVE_EDGES
 	glLineWidth(50.0);
 	glBegin(GL_LINES);
@@ -174,6 +188,7 @@ void display()
 	glLineWidth(1.0f);
 	#endif
 
+	//Draw BSPLINE CURVES
 	#ifdef BSPLINE_OVERLAY
 	glLineWidth(5.0f);
 	for(pair<vector<Point>,Color> curve: mainOutLine)

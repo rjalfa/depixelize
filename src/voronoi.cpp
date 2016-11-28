@@ -14,10 +14,7 @@ void Voronoi::createDiagram(Graph& graph)
 
 	for(int i = 0; i < w; i++) 
 	{
-		vector<vector<pair<bool,int>>> v1;
 		vector<vector<pair<float,float>>> v2(h);
-		for(int j = 0; j < h; j ++) v1.push_back(vector<pair<bool,int>>(8,make_pair(false,0)));
-		polygons.push_back(v1);
 		voronoiPts.push_back(v2);
 	}
 	createRegions(graph);
