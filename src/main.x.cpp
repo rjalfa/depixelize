@@ -3,8 +3,17 @@
 #include "graph.h"
 #include "voronoi.h"
 #include "spline.h"
+
+#define PIXELS
+
+#include <GL/freeglut.h>
+#include <GL/gl.h>
+#include <iostream>
+
 using namespace std;
 float IMAGE_SCALE = 1.0f;
+
+uint8_t rotateLevel = 0;
 
 //Global vars for use in render()
 Image* gImage = nullptr;
@@ -15,23 +24,23 @@ vector<pair<vector<Point>,Color> > mainOutLine;
 
 int majorwindow;
 
-//Pretty Print graph to cout
+//Pretty Print graph to std::cout
 void printGraph(Graph& g)
 {
-	cout<<"Printing graph"<<endl;
+	std::cout<<"Printing graph"<<endl;
 	Image* img = g.getImage();
 	int width = img->getWidth();
 	int height = img->getHeight();
-	cout<<"(height, width) = ("<<height<<", "<<width<<")\n";
+	std::cout<<"(height, width) = ("<<height<<", "<<width<<")\n";
 	for(int i = 0; i < width; i++)
 	{
 		for(int j = 0; j < height; j++)
 		{
 			for(int k = 0;k<8; k++)
 			{
-				cout<<"("<<i<<","<<j<<","<<k<<") = "<<g.edge(i,j,k)<<"\t";
+				std::cout<<"("<<i<<","<<j<<","<<k<<") = "<<g.edge(i,j,(Direction)k)<<"\t";
 			}
-			cout<<"\n";
+			std::cout<<"\n";
 		}
 	}
 }
@@ -41,7 +50,8 @@ void keyboard(unsigned char key, int x, int y)
 {
 	switch(key)
   	{
-		case 27:exit(0);break; 
+		case 27:exit(0);break;
+		case 'r':rotateLevel = (rotateLevel + 1) % 4; break;
   	}
 }
 
@@ -58,14 +68,29 @@ float convCoordY(float y)
 	return (2*y)/(IMAGE_SCALE*(gImage->getHeight())) - 1;
 }
 
+// Converts {[0,width],[0, height]} -> {[-1,1], [-1,1]}
+// Map :: [0,0] -> [-1, 1]
+// Map :: [width, height] -> [1, -1]
+void draw(float px, float py) {
+	float width = gImage->getWidth();
+	float height = gImage->getHeight();
+	float x = (2 * px) / width - 1;
+	float y = 1 - (2 * py) / height;
+	glVertex2f(x, y);
+}
+
+void draw(Point p) {
+	draw(X(p), Y(p));
+}
+
 //Function to draw a closed convex polygon with fill color.
 void drawPolygon(vector<pair<float,float> > hull, float r, float g, float b)
 {
 	glColor3f(r,g,b);
 	//Need to tessellate for handling concaves
 	glBegin(GL_POLYGON);
-	for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
-	if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
+	for (const auto& point : hull) draw(point);
+	if (hull.size()) draw(hull[0]);
 	glEnd();
 
 }
@@ -78,7 +103,7 @@ void drawSpline(pair<float,float> p1, pair<float,float> p2, pair<float,float> p3
 {
 	vector<vector<float>> matrix = gCurves->getSpline({p1,p2,p3});
 	//T is extroplated a little for intersecting pieces
-	
+
 	// parameter t that will generate all the points
 	float t = -0.1f;
 
@@ -87,7 +112,37 @@ void drawSpline(pair<float,float> p1, pair<float,float> p2, pair<float,float> p3
 
 	// store x,y after multiplying with 1, t and t^2
 	float xcor, ycor;
-	for(;t<=1.1f; t+=step) glVertex2f(convCoordX(evalBspline(matrix[0][0],matrix[1][0],matrix[2][0],t)), convCoordY(evalBspline(matrix[0][1],matrix[1][1],matrix[2][1],t)));
+	for(;t<=1.1f; t+=step) draw(evalBspline(matrix[0][0],matrix[1][0],matrix[2][0],t), evalBspline(matrix[0][1],matrix[1][1],matrix[2][1],t));
+}
+
+std::pair<float, float> getCenter(int x, int y, int width, int height) {
+	float cx = (2 * x - 1.0f - width) / width;
+	float cy = (height - 2 * y + 1.0f) / height;
+	return std::make_pair(cx, cy);
+}
+
+void drawCell(int x, int y) {
+	float cx = x + 0.5f;
+	float cy = y + 0.5f;
+	draw(cx - 0.5f, cy - 0.5f);
+	draw(cx + 0.5f, cy - 0.5f);
+	draw(cx + 0.5f, cy + 0.5f);
+	draw(cx - 0.5f, cy + 0.5f);
+}
+
+// cx, cy is a coord with TL (1,1) and BR (w, h)
+void drawLine(int x1, int y1, int x2, int y2, int width, int height) {
+	auto centerPoint1 = getCenter(x1, y1, width, height);
+	float cx1 = centerPoint1.first;
+	float cy1 = centerPoint1.second;
+	auto centerPoint2 = getCenter(x2, y2, width, height);
+	float cx2 = centerPoint2.first;
+	float cy2 = centerPoint2.second;
+	
+	float invwidth = 1.0f / width;
+	float invheight = 1.0f / height;
+	glVertex2f(cx1, cy1);
+	glVertex2f(cx2, cy2);
 }
 
 //Render Function
@@ -96,36 +151,32 @@ void display()
 	bool check = true;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(1.0,1.0,1.0,0.0);
-	glEnable( GL_MULTISAMPLE );
-	
+	// glEnable( GL_MULTISAMPLE );
+
 	//Print Image [PIXELS]
-	#ifdef PIXELS
+#ifndef PIXELS
 	glBegin(GL_QUADS);
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
-		auto color = (*gImage)(x,y)->getColor();
-		float r = get<0>(color)/255.0;
-		float g = get<1>(color)/255.0;
-		float b = get<2>(color)/255.0;
+		auto color = (*gImage)(x,y)->color();
+		float r = color.R/255.0;
+		float g = color.G/255.0;
+		float b = color.B/255.0;
 		glColor3f(r, g, b);
-		glVertex2f(convCoordX(IMAGE_SCALE*x), convCoordY(IMAGE_SCALE*y));
-		glVertex2f(convCoordX(IMAGE_SCALE*(x+1)), convCoordY(IMAGE_SCALE*y));
-		glVertex2f(convCoordX(IMAGE_SCALE*(x+1)), convCoordY(IMAGE_SCALE*(y+1)));
-		glVertex2f(convCoordX(IMAGE_SCALE*x), convCoordY(IMAGE_SCALE*(y+1)));
+		drawCell(x, y);
 	}
 	glEnd();
-	#endif
+#endif
 
 	//Draw Voronoi Diagrams
-	#ifdef VORONOI
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
-		auto color = (*gImage)(x,y)->getColor();
-		float r = get<0>(color)/255.0;
-		float g = get<1>(color)/255.0;
-		float b = get<2>(color)/255.0;
+		auto color = (*gImage)(x, y)->color();
+		float r = color.R / 255.0;
+		float g = color.G / 255.0;
+		float b = color.B / 255.0;
 		auto hull = (*gDiagram)(x,y);
 
 		//Fill Polygon
@@ -134,76 +185,76 @@ void display()
 		//Draw boundaries of reshaped cells
 		/*glColor3f(0.0f, 0.0f, 0.0f);
 		glBegin(GL_LINE_LOOP);
-		for(int i = 0 ; i < hull.size() ; i++) glVertex2f(convCoordX(IMAGE_SCALE*hull[i].first),convCoordY(IMAGE_SCALE*hull[i].second));
-		if(hull.size()) glVertex2f(convCoordX(IMAGE_SCALE*hull[0].first),convCoordY(IMAGE_SCALE*hull[0].second));
+		for(const auto& point : hull) draw(point);
+		if(hull.size()) draw(hull[0]);
 		glEnd();*/
 	}
-	#endif
 
+
+#if 0
 	// Print Similarity graph
-	#ifdef SIM
+	glBegin(GL_LINES);
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
-		for(int k = 0 ; k < 8; k++) if(gSimilarity->edge(x,y,k))
+		for(int k = 0 ; k < 8; k++) if(gSimilarity->edge(x,y,(Direction)k))
 		{
-			glBegin(GL_LINES);
 			glColor3f(0.5,0.5,1.0);
-			glVertex2f(convCoordX(IMAGE_SCALE*(x+0.5)), convCoordY(IMAGE_SCALE*(y+0.5)));
-			glVertex2f(convCoordX(IMAGE_SCALE*(x+0.5+direction[k][0])), convCoordY(IMAGE_SCALE*(y+0.5+direction[k][1])));
-			glEnd();
+			auto adjPixel = gImage->getAdjacent(x, y, (Direction)k);
+			if (adjPixel) {
+				drawLine(x, y, adjPixel->X(), adjPixel->Y(), gImage->getWidth(), gImage->getHeight());
+			}
+				
 		}
 	}
-	#endif
-	
+	glEnd();
+
 	//Draws Voronoi Points around the pixels
-	#ifdef POINTS
 	for(int x = 0 ; x < gImage->getWidth(); x++)
 	for(int y = 0 ; y < gImage->getHeight(); y++)
 	{
 		glColor3f(0.0f,0.0f,1.0f);
 		glPointSize(3);
 		glBegin(GL_POINTS);
-		for(pair<float,float> pt : (*gDiagram)(x,y)) glVertex2f(convCoordX(IMAGE_SCALE*pt.first),convCoordY(IMAGE_SCALE*pt.second));
+		for(const Point& pt : (*gDiagram)(x,y)) draw(pt);
 		glEnd();
 	}
-	#endif
-
+	
+#endif
 	//Draws active edges selected by Spline for curve tracing
-	#ifdef ACTIVE_EDGES
-	glLineWidth(50.0);
+	glLineWidth(5.0);
 	glBegin(GL_LINES);
 	glColor3f(0.0,0.0,1.0);
 	for(auto edge : gCurves->getActiveEdges())
 	{
-		auto color = (edge.second)->getColor();
-		float r = get<0>(color)/255.0;
-		float g = get<1>(color)/255.0;
-		float b = get<2>(color)/255.0;
+		auto color = (edge.second)->color();
+		float r = color.R / 255.0;
+		float g = color.G / 255.0;
+		float b = color.B / 255.0;
 		glColor3f(r,g,b);
-		glVertex2f(convCoordX(IMAGE_SCALE*(edge.first.first.first)), convCoordY(IMAGE_SCALE*(edge.first.first.second)));
-		glVertex2f(convCoordX(IMAGE_SCALE*(edge.first.second.first)), convCoordY(IMAGE_SCALE*(edge.first.second.second)));
+		draw(edge.first.first);
+		draw(edge.first.second);
 	}
 	glEnd();
-	glLineWidth(1.0f);
-	#endif
 
+	glLineWidth(1.0f);
+	
 	//Draw BSPLINE CURVES
-	#ifdef BSPLINE_OVERLAY
-	glLineWidth(5.0f);
+	#ifndef BSPLINE_OVERLAY
+	glLineWidth(10.0f);
 	for(pair<vector<Point>,Color> curve: mainOutLine)
 	{
 		auto points = curve.first;
 		auto color = curve.second;
 		if(points.size() < 2) continue;
-		float r = get<0>(color)/255.0;
-		float g = get<1>(color)/255.0;
-		float b = get<2>(color)/255.0;
+		float r = color.R/255.0;
+		float g = color.G/255.0;
+		float b = color.B/255.0;
 		glColor3f(r,g,b);
 		glBegin(GL_LINE_STRIP);
 		for(int i = 0; i < points.size()-2; i++)
 		{
-			drawSpline(points[i],points[(i+1)%points.size()],points[(i+2)%points.size()]);	
+			drawSpline(points[i],points[(i+1)%points.size()],points[(i+2)%points.size()]);
 			//i++;
 		}
 		glEnd();
@@ -226,25 +277,37 @@ void idleFunction()
 	glutPostRedisplay();
 }
 
+void drawImage(int argc, char* argv[], int width, int height) {
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+	glutInitWindowPosition(2, 2);
+	majorwindow = glutCreateWindow("Depixelize!");
+	glutKeyboardFunc(keyboard);
+	glutInitWindowSize(width, height);
+	glutIdleFunc(idleFunction);
+	glutDisplayFunc(display);
+	glutMainLoop();
+}
+
 int main(int argc, char** argv)
 {
 	if(argc < 2)
 	{
-		cout << "Usage: ./depixel <<image_path>>\n";
+		std::cout << "Usage: " << argv[0] << " <<image_path>>\n";
 		return 1;
 	}
 	//Image contains Pixel Data
 	Image inputImage = Image(string(argv[1]));
 	gImage = &inputImage;
 
-	//Create Similarity Graph
-	Graph similarity(inputImage); 
+	////Create Similarity Graph
+	Graph similarity(inputImage);
 	gSimilarity = &similarity;
 	//Planarize the graph
 	similarity.planarize();
-	
-	//Test planarized similarity graph
-	//printGraph(similarity);
+
+	////Test planarized similarity graph
+	////printGraph(similarity);
 
 	//Create Voronoi diagram for reshaping the pixels
 	Voronoi diagram(inputImage);
@@ -252,37 +315,23 @@ int main(int argc, char** argv)
 	diagram.createDiagram(similarity);
 	//diagram.printVoronoi();
 
-	//Create B-Splines on the end points of Voronoi edges.
+	////Create B-Splines on the end points of Voronoi edges.
 	Spline curves(&diagram);
 	gCurves = &curves;
 	curves.extractActiveEdges();
 	curves.calculateGraph();
 
-	// Check the graph here
+	//// Check the graph here
 
-	// mainOutLine contains all the outline edges where we will fit the b-splines
+	//// mainOutLine contains all the outline edges where we will fit the b-splines
 	mainOutLine = curves.printGraph();
-	//cout << mainOutLine << endl;
+	////std::cout << mainOutLine << endl;
 	//Optimize B-Splines
 
 	//Output Image
 	#ifndef NO_RENDER
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowPosition(2,2);
-	glutInitWindowSize(50*inputImage.getWidth(),50*inputImage.getHeight());
-	majorwindow = glutCreateWindow("Depixelize!");
-	glutKeyboardFunc(keyboard);
-
-	GLenum glew_status = glewInit();
-	if (glew_status != GLEW_OK) {
-		cerr << "Error: glewInit: " << glewGetErrorString(glew_status) << endl;
-		return 1;
-	}
-
-	glutIdleFunc(idleFunction);
-	glutDisplayFunc(display);
-	glutMainLoop();
+	drawImage(argc, argv, inputImage.getWidth(), inputImage.getHeight());
+	//draw_square(argc, argv, 50, 50);
 	#endif
 	return 0;
 }

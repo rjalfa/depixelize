@@ -3,10 +3,12 @@
 #ifndef _SPLINE_H
 #define _SPLINE_H
 
-#include "common.h"
-#include "image.h"
-#include "graph.h"
 #include "voronoi.h"
+
+#include <vector>
+#include <utility>
+#include <set>
+#include <map>
 
 //Class Spline: For handling path detection for drawing continuous curves and bspline generation
 
@@ -16,10 +18,10 @@ class Spline
 	Voronoi* diagram;
 
 	//List of all edges that have sufficiently different colors at the 2 sides
-	vector<pair<Edge,_pixel*> > activeEdges;
+	std::vector<std::pair<Edge,Pixel*> > activeEdges;
 
 	//Contains a adjacency list representation for the above
-	map<Point, set<pair<Point,Color> > > graph;
+	std::map<Point, std::set<std::pair<Point,Color> > > graph;
 	public:
 		//Parametric Constructor
 		Spline(Voronoi* d) : diagram(d) {};
@@ -28,7 +30,7 @@ class Spline
 		Spline() : diagram(nullptr) {};
 		
 		//Accessor
-		vector<pair<Edge,_pixel*> >& getActiveEdges() {return activeEdges;}
+		std::vector<std::pair<Edge,Pixel*> >& getActiveEdges() {return activeEdges;}
 		
 		//Extract active edges from the diagram
 		void extractActiveEdges();
@@ -37,13 +39,13 @@ class Spline
 		void calculateGraph();
 
 		//Traverse a continuous curve starting from p and following color similar to c
-		vector<Point > traverseGraph(const Point& p, const Color& c);
+		std::vector<Point> traverseGraph(const Point& p, const Color& c);
 
 		//Get quadratic uniform B-spline for 3 points
-		vector<vector<float> > getSpline(vector<Point> points);
+		std::vector<std::vector<float> > getSpline(std::vector<Point> points);
 		
 		//Get the traced paths for drawing splines
-		vector<pair<vector<Point>,Color> > printGraph();
+		std::vector<std::pair<std::vector<Point>,Color> > printGraph();
 };
 
 #endif

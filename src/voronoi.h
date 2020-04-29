@@ -2,7 +2,6 @@
 
 #ifndef _VORONOI_H
 #define _VORONOI_H
-#include "common.h"
 #include "graph.h"
 
 //Class Voronoi: Handling Voronoi diagram creation (Reshaping of cells)
@@ -13,13 +12,13 @@ class Voronoi
 	Image* imageRef;
 
 	//Contains voronoi points around every pixel (x,y), in clockwise order starting from top-left
-	vector<vector<vector<pair<float, float>>>> voronoiPts;
+	std::vector<std::vector<std::vector<std::pair<float, float>>>> voronoiPts;
 
 	//Valency of each voronoi point for collapsing
-	map<pair<float,float>,int> valency;
+	std::map<std::pair<float,float>,int> valency;
 
 	//Function to check if the voronoi point is on the boundary of the image.
-	bool onBoundary(pair<float,float> p);
+	bool onBoundary(Point p);
 	public: 
 		//Parametric Constructor
 		Voronoi(Image& inputImage) { imageRef = &inputImage;}
@@ -37,8 +36,8 @@ class Voronoi
 		void collapseValence2();
 
 		//Accessors
-		vector<pair<float,float>> operator()(int i,int j);
-		vector<pair<float,float>> getHull(int i,int j);
+		std::vector<Point> operator()(int i,int j);
+		std::vector<Point> getHull(int i,int j);
 		Image* getImage() {return imageRef;};
 };
 

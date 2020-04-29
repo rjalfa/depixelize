@@ -1,101 +1,86 @@
 #include "image.h"
+#include "BMP.h"
+#include "common.h"
 
-//File loading 
-BMP::BMP(const char* FilePath)
+#include <map>
+
+bool ColorYUV::is_similar(const ColorYUV& c) const
 {
-    std::fstream hFile(FilePath, std::ios::in | std::ios::binary);
-    if (!hFile.is_open()) throw std::invalid_argument("Error: File Not Found.");
-
-    hFile.seekg(0, std::ios::end);
-    std::size_t Length = hFile.tellg();
-    hFile.seekg(0, std::ios::beg);
-    std::vector<std::uint8_t> FileInfo(Length);
-    hFile.read(reinterpret_cast<char*>(FileInfo.data()), 54);
-
-    if(FileInfo[0] != 'B' && FileInfo[1] != 'M')
-    {
-        hFile.close();
-        throw std::invalid_argument("Error: Invalid File Format. Bitmap Required.");
-    }
-
-    if (FileInfo[28] != 24 && FileInfo[28] != 32)
-    {
-        hFile.close();
-        throw std::invalid_argument("Error: Invalid File Format. 24 or 32 bit Image Required.");
-    }
-
-    BitsPerPixel = FileInfo[28];
-    width = FileInfo[18] + (FileInfo[19] << 8);
-    height = FileInfo[22] + (FileInfo[23] << 8);
-    std::uint32_t PixelsOffset = FileInfo[10] + (FileInfo[11] << 8);
-    std::uint32_t size = ((width * BitsPerPixel + 31) / 32) * 4 * height;
-    Pixels.resize(size);
-
-    hFile.seekg (PixelsOffset, std::ios::beg);
-    hFile.read(reinterpret_cast<char*>(Pixels.data()), size);
-    hFile.close();
+    return is_similar_2(c, 0.0);
+}
+bool ColorYUV::is_similar_2(const ColorYUV& c, double softness) const
+{
+    return abs(Y - c.Y) < softness + 48.0 \
+        && abs(U - c.U) < softness + 7.0 \
+        && abs(V - c.V) < softness + 6.0;
 }
 
-_pixel::_pixel(Image* const image_ref, int R, int G, int B, int x, int y)
+// Converting to YUV as per Wikipedia definitions
+ColorYUV Color::toYUV() const {
+    double y = 0.299 * R + 0.587 * G + 0.114 * B;
+    double u = 0.492 * (B - y);
+    double v = 0.877 * (R - y);
+    return ColorYUV{ y, u, v };
+}
+
+Pixel::Pixel(Image* const image_ref, unsigned int R, unsigned int G, unsigned int B, int x, int y)
 {
     this->image_ref = image_ref;
-    this->colors = make_tuple(R,G,B);
-    this->position = make_pair(x,y);
+    this->m_color = Color{ R, G, B };
+    this->position = std::make_pair(x,y);
 }
 
-//http://www.pcmag.com/encyclopedia/term/55166/yuv-rgb-conversion-formulas
-void _pixel::convertYUV(double& y,double& u, double& v)
+void Pixel::print(std::ostream& out)
 {
-    y = 0.299*get<0>(this->colors) + 0.587*get<1>(this->colors) + 0.114*get<2>(this->colors);
-    u = 0.492*(get<2>(this->colors) - y);
-    v = 0.877*(get<0>(this->colors) - y);      
+    auto yuv = ColorYUV(m_color);
+    out << "<<(" << position.first << "," << position.second << "):{"<< yuv.Y <<","<< yuv.U <<","<< yuv.V <<"}>>";
 }
 
-void _pixel::print(ostream& out)
+Image::Image(const std::string& file)
 {
-    double y1,u1,v1;
-    this->convertYUV(y1,u1,v1);
-    out << "<<(" << position.first << "," << position.second << "):{"<<y1<<","<<u1<<","<<v1<<"}>>"; 
-}
-
-Image::Image(string file)
-{
-    auto data = BMP(file.c_str());
-    this->width = data.GetWidth();
-    this->height = data.GetHeight();
-    long off = 0;
-    int row = 0, col=0;
-    while(off < data.GetPixels().size())
-    {
-        pixels.push_back(_pixel(this,data.GetPixels()[off+2],data.GetPixels()[off+1],data.GetPixels()[off],row,col));
-        off += 3;
-        row = (row + 1) % width;
-        if(row == 0) {off += 2;col = (col + 1)%height;}
+    auto raw_data = BMP(file.c_str());
+    this->width = raw_data.bmp_info_header.width;
+    this->height = raw_data.bmp_info_header.height;
+    this->pixels.resize(this->width);
+    int row = 0, col = 0;
+    for (int row = 0; row < this->width; row++) {
+        pixels[row].resize(this->height);
+        for (int col = 0; col < this->height; col++)
+        {
+            uint8_t R, G, B, A;
+            raw_data.get_pixel(row, this->height - 1 - col, B, G, R, A);
+            pixels[row][col] = Pixel(this, R, G, B, row, col);
+        }
     }
-    assert(off== data.GetPixels().size());
 }
 
-_pixel* Image::operator()(unsigned int i, unsigned int j)
+std::map<Direction, std::pair<int, int>> direction_deltas = {
+    {TOP_LEFT, std::make_pair(-1, -1)},
+    {TOP, std::make_pair(0, -1)},
+    {TOP_RIGHT, std::make_pair(1, -1)},
+    {BOTTOM_LEFT, std::make_pair(-1, 1)},
+    {BOTTOM, std::make_pair(0, 1)},
+    {BOTTOM_RIGHT, std::make_pair(1, 1)},
+    {LEFT, std::make_pair(-1, 0)},
+    {RIGHT, std::make_pair(1, 0)}
+};
+
+Pixel* Image::operator()(unsigned int i, unsigned int j)
 {
-    if(i >= 0 && i < width && j >= 0 && j < height) return &pixels[i+ j*width];
+    if(i >= 0 && i < this->width
+        && j >= 0 && j < this->height) return &pixels[i][j];
     else return nullptr;
 }
 
-bool _pixel::isSimilar(_pixel& a)
-{
-    double y1,u1,v1;
-    this->convertYUV(y1,u1,v1);
-    double y2,u2,v2;
-    a.convertYUV(y2,u2,v2);
-    return (abs(y1-y2) < 48.0 && abs(u1-u2) < 7.0 && abs(v1-v2) < 6.0);
+Pixel* Image::getAdjacent(unsigned int i, unsigned int j, enum Direction dir) {
+    const std::pair<int, int>& deltas = direction_deltas[dir];
+    unsigned int adjX = i + X(deltas);
+    unsigned int adjY = j + Y(deltas);
+    auto ret = this->operator()(adjX, adjY);
+    return ret;
 }
 
-//Softer isSimilar
-bool _pixel::isSimilar2(_pixel& a)
-{
-    double y1,u1,v1;
-    this->convertYUV(y1,u1,v1);
-    double y2,u2,v2;
-    a.convertYUV(y2,u2,v2);
-    return (abs(y1-y2) < 20+48.0 && abs(u1-u2) < 20+7.0 && abs(v1-v2) < 20+6.0);
+Pixel* Image::getAdjacent(const Pixel* const p, enum Direction dir) {
+    if (p) return getAdjacent(p->X(), p->Y(), dir);
+    return nullptr;
 }

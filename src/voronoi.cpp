@@ -1,4 +1,6 @@
 #include "voronoi.h"
+#include <iostream>
+
 int height, width;
 
 void Voronoi::createDiagram(Graph& graph)
@@ -9,19 +11,16 @@ void Voronoi::createDiagram(Graph& graph)
 	height = h;
 	width = w;
 
-	//Semantic
-	// edges[i][j][k] -> denotes whether there is a an edge from (i,j) in kth direction in the graph
-
-	for(int i = 0; i < w; i++) 
+	for(int i = 0; i < w; i++)
 	{
-		vector<vector<pair<float,float>>> v2(h);
+		std::vector<std::vector<Point>> v2(h);
 		voronoiPts.push_back(v2);
 	}
 	createRegions(graph);
 	collapseValence2();
 }
 
-bool Voronoi::onBoundary(pair<float,float> p)
+bool Voronoi::onBoundary(Point p)
 {
 	return p.first == 0 || p.first == width || p.second == 0 || p.second == height;
 }
@@ -29,14 +28,14 @@ bool Voronoi::onBoundary(pair<float,float> p)
 void Voronoi::printVoronoi()
 {
 
-	cout<<"\nImage height = "<<height<<"\tImage width = "<<width << endl;
+	std::cout << "\nImage height = " << height << "\tImage width = " << width << std::endl;
 	for(int i=0; i <width; i++)
 	{
 		for(int j=0; j< height; j++)
 		{
-			cout<<"voronoi["<<i<<"]["<<j<<"] = "<<voronoiPts[i][j] << ",Pixel:";
-			(*imageRef)(i,j)->print(cout);
-			cout<<"\n";
+			std::cout<< "voronoi[" << i << "][" << j << "] = " << voronoiPts[i][j] << ",Pixel:";
+			(*imageRef)(i,j)->print(std::cout);
+			std::cout << "\n";
 		}
 	}
 
@@ -54,7 +53,7 @@ void Voronoi::collapseValence2()
 	{
 		for(int y=0; y< height; y++)
 		{
-			for(int i = 0 ; i < voronoiPts[x][y].size(); i++) 
+			for(int i = 0 ; i < voronoiPts[x][y].size(); i++)
 			{
 				int l = i;
 				int r = (i+1)%(voronoiPts[x][y].size());
@@ -69,85 +68,101 @@ void Voronoi::collapseValence2()
 	{
 		for(int y=0; y< height; y++)
 		{
-			vector<pair<float,float> > temp;
-			for(int i = 0 ; i < voronoiPts[x][y].size(); i++) 
+			std::vector<Point> temp;
+			for(int i = 0 ; i < voronoiPts[x][y].size(); i++)
 			{
-				if(valency[voronoiPts[x][y][i]] != 4 || onBoundary(voronoiPts[x][y][i])) temp.push_back(voronoiPts[x][y][i]);  
+				if(valency[voronoiPts[x][y][i]] != 4 || onBoundary(voronoiPts[x][y][i])) temp.push_back(voronoiPts[x][y][i]);
 			}
 			voronoiPts[x][y].clear();
-			voronoiPts[x][y] = vector<pair<float,float> >(temp);
-		}	
+			voronoiPts[x][y] = std::vector<Point>(temp);
+		}
 	}
 }
 
 /*
-/	Create voronoi region around each pixel 
-/	voronoiPts[x][y].vector<pair<float,float>> will contain all the coordinates(float, float) 
+/	Create voronoi region around each pixel
+/	voronoiPts[x][y].vector<pair<float,float>> will contain all the coordinates(float, float)
 /	that creates the voronoi region
 */
 void Voronoi::createRegions(Graph& graph)
 {
 	int x, y, z;
 	float xcenter, ycenter;
-	for(x = 0; x< width; x++)
+	for(x = 0; x < width; x++)
 	{
 		for(y = 0; y < height; y++)
 		{
-
+			Pixel* p = graph.getImage()->operator()(x, y);
 			xcenter = x + 0.5;
 			ycenter = y + 0.5;
+
+			// VORONOI DIAGRAM CALCULATION
+			// Each corner can do three things:
+			// 1. Gain space from other cells (via type 1 and 2 points) (if an edge exists in that direction)
+			// 2. Lose space to other cells (via type 3) (if an external edge cuts that corner)
+			// 3. Keep the same space (there are no edges) (original corner point)
+			// All the edge midpoints are kept to complete the diagram
+			// Edges through the edge midpoints don't affect this diagram
+			// This addition of points is done in anti-clowise order
+			// TOPLEFT -> LEFT -> BOTTOMLEFT -> BOTTOM -> BOTTOMRIGHT -> RIGHT -> TOPRIGHT -> TOP
+
 			//TOPLEFT
-			if(graph.edge(x,y,TOP_LEFT))
+			if(graph.edge(p, TOP_LEFT))
 			{
-				voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter-0.75));
-				voronoiPts[x][y].push_back(make_pair(xcenter-0.75,ycenter-0.25));
+				voronoiPts[x][y].emplace_back(xcenter - 0.25, ycenter - 0.75); // 1
+				voronoiPts[x][y].emplace_back(xcenter - 0.75, ycenter - 0.25); // 2
 			}
-			else if(graph.edge(x+direction[TOP][0],y+direction[TOP][1],BOTTOM_LEFT)) voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter-0.25)); 
-			else voronoiPts[x][y].push_back(make_pair(xcenter-0.5,ycenter-0.5));
-			
-			//TOP
-			voronoiPts[x][y].push_back(make_pair(xcenter-0.5,ycenter));
+			else if(graph.edge(p->A(TOP),BOTTOM_LEFT))
+				voronoiPts[x][y].emplace_back(xcenter - 0.25, ycenter - 0.25); // 3
+			else voronoiPts[x][y].emplace_back(xcenter - 0.5, ycenter - 0.5); // 4
 
-			//TOPRIGHT
-			if(graph.edge(x,y,TOP_RIGHT))
-			{
-				voronoiPts[x][y].push_back(make_pair(xcenter-0.75,ycenter+0.25));
-				voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter+0.75));
-			}
-			else if(graph.edge(x+direction[TOP][0],y+direction[TOP][1],BOTTOM_RIGHT)) voronoiPts[x][y].push_back(make_pair(xcenter-0.25,ycenter+0.25)); 
-			else voronoiPts[x][y].push_back(make_pair(xcenter-0.5,ycenter+0.5));
-			
-			//RIGHT
-			voronoiPts[x][y].push_back(make_pair(xcenter,ycenter+0.5));
-
-			//BOTTOMRIGHT
-			if(graph.edge(x,y,BOTTOM_RIGHT))
-			{
-				voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter+0.75));
-				voronoiPts[x][y].push_back(make_pair(xcenter+0.75,ycenter+0.25));
-			}
-			else if(graph.edge(x+direction[BOTTOM][0],y+direction[BOTTOM][1],TOP_RIGHT)) voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter+0.25)); 
-			else voronoiPts[x][y].push_back(make_pair(xcenter+0.5,ycenter+0.5));
-			
-			//BOTTOM
-			voronoiPts[x][y].push_back(make_pair(xcenter+0.5,ycenter));
+			//LEFT
+			voronoiPts[x][y].emplace_back(xcenter - 0.5, ycenter); // Mid-point
 
 			//BOTTOMLEFT
-			if(graph.edge(x,y,BOTTOM_LEFT))
+			if(graph.edge(p,BOTTOM_LEFT))
 			{
-				voronoiPts[x][y].push_back(make_pair(xcenter+0.75,ycenter-0.25));
-				voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter-0.75));
+				voronoiPts[x][y].emplace_back(xcenter - 0.75, ycenter + 0.25); // 1
+				voronoiPts[x][y].emplace_back(xcenter - 0.25, ycenter + 0.75); // 2
 			}
-			else if(graph.edge(x+direction[BOTTOM][0],y+direction[BOTTOM][1],TOP_LEFT)) voronoiPts[x][y].push_back(make_pair(xcenter+0.25,ycenter-0.25)); 
-			else voronoiPts[x][y].push_back(make_pair(xcenter+0.5,ycenter-0.5));
-			
-			//LEFT
-			voronoiPts[x][y].push_back(make_pair(xcenter,ycenter-0.5));
+			else if(graph.edge(p->A(BOTTOM),TOP_LEFT))
+				voronoiPts[x][y].emplace_back(xcenter - 0.25, ycenter + 0.25); // 3
+			else voronoiPts[x][y].emplace_back(xcenter - 0.5, ycenter + 0.5); // 4
+
+			//BOTTOM
+			voronoiPts[x][y].emplace_back(xcenter, ycenter + 0.5); // Mid-point
+
+			//BOTTOMRIGHT
+			if(graph.edge(p, BOTTOM_RIGHT))
+			{
+				voronoiPts[x][y].emplace_back(xcenter + 0.25, ycenter + 0.75); // 1
+				voronoiPts[x][y].emplace_back(xcenter + 0.75, ycenter + 0.25); // 2
+			}
+			else if(graph.edge(p->A(BOTTOM),TOP_RIGHT))
+				voronoiPts[x][y].emplace_back(xcenter + 0.25, ycenter + 0.25); // 3
+			else voronoiPts[x][y].emplace_back(xcenter + 0.5, ycenter + 0.5); // 4
+
+			//RIGHT
+			voronoiPts[x][y].emplace_back(xcenter + 0.5, ycenter); // Mid-point
+
+			//TOPRIGHT
+			if(graph.edge(p, TOP_RIGHT))
+			{
+				voronoiPts[x][y].emplace_back(xcenter + 0.75, ycenter - 0.25); // 1
+				voronoiPts[x][y].emplace_back(xcenter + 0.25, ycenter - 0.75); // 2
+			}
+			else if(graph.edge(p->A(TOP), BOTTOM_RIGHT))
+				voronoiPts[x][y].emplace_back(xcenter + 0.25, ycenter - 0.25); // 3
+			else voronoiPts[x][y].emplace_back(xcenter + 0.5, ycenter - 0.5); // 4
+
+			//TOP
+			voronoiPts[x][y].emplace_back(xcenter, ycenter - 0.5); // Mid-point
+
 		}
 	}
 }
 
-vector<pair<float,float>> Voronoi::operator()(int i,int j)
+std::vector<Point> Voronoi::operator()(int i,int j)
 {
 	return voronoiPts[i][j];
 }

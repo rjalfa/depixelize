@@ -1,4 +1,8 @@
+# From VS
 build/
+out/
+.vs/
+*.json
 
 # Compiled Object files
 *.slo

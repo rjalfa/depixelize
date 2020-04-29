@@ -3,11 +3,11 @@
 </div>
 
 # Depixelize PixelArt
-Depixelize lets you to create beautiful looking anti aliased images using the 1990s pixel art. 
+Depixelize lets you to create beautiful looking anti aliased images using the 1990s pixel art.
 An implementation of the algorithm stated in '[Depixeizing Pixel Art](http://johanneskopf.de/publications/pixelart/)' by Johannes Kopf and Dani Lischinski published in [SIGGRAPH 2011](http://www.siggraph.org/s2011/).
 
 ## Getting Started
-The algorithm is divided into following parts - 
+The algorithm is divided into following parts -
 * Input the image
 * Initialize the similarity graph on the basis of pixel colors
 * Resolve crossing edges using different heuristics
@@ -18,18 +18,34 @@ The algorithm is divided into following parts -
 *Images comes here
 
 ### Prerequisites  
-* G++  
+* [CMake](https://cmake.org/)
 * [OpenGL](https://www.opengl.org/)
-* [GLEW: The OpenGL Extension Wrangler Library](glew.sourceforge.net/)
 * [GLUT - The OpenGL Utility Toolkit](https://www.opengl.org/resources/libraries/glut/)
-* make
 
-### Try (it's fun) 
+### Building
+Make sure you have CMake and glut libraries installed. Install any recent version (>= 3.15.0) of CMake. For glut:
+
+#### On Linux
+```
+sudo apt install freeglut3-dev
+```
+#### On Windows
+Download glut libraries from [here](https://www.transmissionzero.co.uk/software/freeglut-devel/) (MSVC or MinGW according to the compiler present on your system) and extract it in a folder. Then, use GLUT_ROOT_PATH variable to use the downloaded package.
+
+#### Steps to build
+```
+cmake -H. -Bbuild # Add -DGLUT_ROOT_PATH=<path/to/glut/installation> if required.
+cmake --build build
+
+# Binary should be present at ./build/depixelize
+# NOTE: On windows, the GLUT DLLs are copied alongside the binary, thus if you moe the binary, you want to move them together
+cmake
+```
+### Try (it's fun)
 ```shell
-$ sudo make
+$
 $ ./build/depixelize ./test/dolphin.bmp
 ```
 ### Acknowledgments
 * [Depixelizing Pixel Art](http://johanneskopf.de/publications/pixelart/) by Johannes Kopf and Dani Lischinski]
 * [YUV/RGB Conversion formulas](http://www.pcmag.com/encyclopedia/term/55166/yuv-rgb-conversion-formulas)
-* [Loading bmp file in C++/Opengl](http://stackoverflow.com/questions/20595340/loading-a-tga-bmp-file-in-c-opengl)
